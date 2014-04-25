@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 
-def fancy_legend(ax,loc='best'):
-    ax.legend(loc=loc,fancybox=True, framealpha=0.5)
+def fancy_legend(ax,loc='best',size=12):
+    ax.legend(loc=loc,fancybox=True, framealpha=0.5,
+              prop={'size':size})
 
 def ticks_bins(ax,axis='x',n=4):
     ax.locator_params(nbins=n,axis=axis)
@@ -105,6 +106,14 @@ def wide_fig(
                 ticks_bins(ax=cax,axis='y',n=4)
 
     return fig
+
+
+def axes3():
+    import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d import Axes3D
+    fig = plt.figure()
+    ax=fig.add_subplot(111, projection='3d')
+    return ax
 
 def tune_x_lim(axs,axis='x'):
     """

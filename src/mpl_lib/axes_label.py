@@ -65,7 +65,7 @@ def __effr__(ax,ft):
     ax.set_ylabel('R-value',dict(fontsize=ft))
 
 def __eqvr__(ax,ft):
-    ax.set_xlabel(r'Effective strain $\bar{E}$',dict(fontsize=ft))
+    ax.set_xlabel(r'Equivalent strain $\bar{E}$',dict(fontsize=ft))
     ax.set_ylabel('R-value',dict(fontsize=ft))
 
 def __unix__(ax,ft,i=1,j=1):
@@ -81,3 +81,29 @@ def __vol__(ax,ft,i=1,j=1):
     """
     ax.set_xlabel(r'$\varepsilon_{%i%i}$'%(i,j),dict(fontsize=ft))
     ax.set_ylabel(r'$V_{ph}$',dict(fontsize=ft))
+
+def __deco__(ax,ft=15,iopt=0,ij=None):
+    """
+    """
+    if iopt==0:
+        ax.set_xlabel(r'$\sin^2{\psi}$',dict(fontsize=ft))
+        ax.set_ylabel(r'$\varepsilon^{\mathrm{hkl}}$',
+                      dict(fontsize=ft))
+    if iopt==1:
+        ax.set_xlabel(r'$\sin^2{\psi}$',dict(fontsize=ft))
+        if ij==None:
+            label = r'$F_{ij}$'
+        else:
+            label = r'$F_{%i%i}$'%(
+                ij[0],ij[1])
+        ax.set_ylabel(label,dict(fontsize=ft))
+        #ax.set_ylim(-2,2)
+
+    if iopt==2:
+        ax.set_xlabel(r'$\sin^2{\psi}$',dict(fontsize=ft))
+        ax.set_ylabel(r'$\varepsilon_{\mathrm{IG}}^{\mathrm{hkl}}$',
+                      dict(fontsize=ft))
+    if iopt==3:
+        ax.set_xlabel(r'$\bar{E}^{\mathrm{eff}}$',dict(fontsize=ft))
+        ax.set_ylabel(r'$\bar{\Sigma}^{\mathrm{eff}}$',dict(fontsize=ft))
+    ax.grid('on')

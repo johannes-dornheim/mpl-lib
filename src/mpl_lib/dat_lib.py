@@ -1,4 +1,4 @@
-## dat analysis library
+xxxx## dat analysis library
 def trim(x,ref):
     ind=len(ref)-1
     for i in range(len(ref)):

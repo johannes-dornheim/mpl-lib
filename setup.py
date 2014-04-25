@@ -4,6 +4,6 @@ setup(name='MPL_personal_lib',
       description='collection of personal matplotlib lib',
       author='Youngung Jeong',
       author_email='youngung.jeong@gmail.com',
-      packages=['mpl_lib'],
-      package_dir={'mpl_lib':'src/mpl_lib'}
+      packages=['mpl_lib','mech'],
+      package_dir={'mpl_lib':'src/mpl_lib','mech':'src/mech'}
 )
