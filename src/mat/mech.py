@@ -30,6 +30,61 @@ class FlowCurve:
         self.name = name
         self.descr = description
 
+    def get_eqv(self):
+        """
+        equivalent scholar value that represents
+        the full tensorial states
+        """
+        self.get_energy()
+        self.get_vm_stress()
+        self.epsilon_vm = self.w/self.sigma_vm
+
+        print 'VM stress:', self.sigma_vm
+        print 'VM strain:', self.epsilon_vm
+
+
+    def get_energy(self):
+        w = 0
+        for i in range(3):
+            for j in range(3):
+                w = w + self.epsilon[i,j] * self.sigma[i,j]
+        self.w = w
+
+    def get_deviatoric_stress(self):
+        self.sigma_dev = np.zeros(self.sigma.shape)
+        ijx = np.identity(3)
+        hydro = 0.
+        for i in range(3):
+            hydro = hydro + self.sigma[i,i]
+        for i in range(3):
+            for j in range(3):
+                self.sigma_dev[i,j] = self.sigma[i,j]\
+                                      - 1./3. * hydro * ijx[i,j]
+
+    def get_deviatoric_strain(self):
+        self.epsilon_dev = np.zeros(self.epsilon.shape)
+        ijx = np.identity(3)
+        vol = 0.
+        for i in range(3):
+            vol = vol + self.epsilon[i,i]
+        for i in range(3):
+            for j in range(3):
+                self.epsilon_dev[i,j] = self.epsilon[i,j]\
+                                        - 1./3. * vol * ijx[i,j]
+
+    def get_vm_stress(self):
+        """
+        Get Von Mises equivalent stress
+        """
+        self.get_deviatoric_stress()
+        vm = 0.
+        for i in range(3):
+            for j in range(3):
+                vm = vm + self.sigma_dev[i,j]**2
+        vm = 3./2. * vm
+        self.sigma_vm = np.sqrt(vm)
+
+
     def plot(self,ifig=1):
         import matplotlib.pyplot as plt
         fig = plt.figure(ifig)
