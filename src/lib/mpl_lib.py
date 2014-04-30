@@ -4,6 +4,14 @@ def fancy_legend(ax,loc='best',size=12):
     ax.legend(loc=loc,fancybox=True, framealpha=0.5,
               prop={'size':size})
 
+def ticks_bins_ax_u(axes,n=4):
+    ticks_bins_ax(axes,axis='x',n=n)
+    ticks_bins_ax(axes,axis='y',n=n)
+
+def ticks_bins_ax(axes,axis='x',n=4):
+    for i in range(len(axes)):
+        ticks_bins(axes[i],axis=axis,n=n)
+
 def ticks_bins(ax,axis='x',n=4):
     ax.locator_params(nbins=n,axis=axis)
 
@@ -114,6 +122,12 @@ def axes3():
     fig = plt.figure()
     ax=fig.add_subplot(111, projection='3d')
     return ax
+
+
+def tune_xy_lim(axs):
+    tune_x_lim(axs,axis='x')
+    tune_x_lim(axs,axis='y')
+
 
 def tune_x_lim(axs,axis='x'):
     """

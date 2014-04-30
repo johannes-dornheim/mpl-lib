@@ -42,7 +42,6 @@ class FlowCurve:
         print 'VM stress:', self.sigma_vm
         print 'VM strain:', self.epsilon_vm
 
-
     def get_energy(self):
         w = 0
         for i in range(3):
@@ -83,7 +82,6 @@ class FlowCurve:
                 vm = vm + self.sigma_dev[i,j]**2
         vm = 3./2. * vm
         self.sigma_vm = np.sqrt(vm)
-
 
     def plot(self,ifig=1):
         import matplotlib.pyplot as plt
