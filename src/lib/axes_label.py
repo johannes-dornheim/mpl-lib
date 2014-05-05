@@ -82,8 +82,27 @@ def __vol__(ax,ft,i=1,j=1):
     ax.set_xlabel(r'$\varepsilon_{%i%i}$'%(i,j),dict(fontsize=ft))
     ax.set_ylabel(r'$V_{ph}$',dict(fontsize=ft))
 
+def __plane__(ax,ft,iopt=0):
+    if iopt==0:
+        xlab = r'$\Sigma_{RD}$'
+        ylab = r'$\Sigma_{TD}$'
+    if iopt==1:
+        xlab = r'$E_{RD}$'
+        ylab = r'$E_{TD}$'
+    ax.set_xlabel(xlab,dict(fontsize=ft))
+    ax.set_ylabel(ylab,dict(fontsize=ft))
+    ax.grid('on')
+    ax.set_aspect('equal')
+
+    mx1=ax.get_xlim()[1]
+    mx2=ax.get_ylim()[1]
+    mx = max([mx1,mx2])
+    ax.set_xlim(0.,mx)
+    ax.set_ylim(0.,mx)
+
 def __deco__(ax,ft=15,iopt=0,ij=None):
     """
+    diffraction plot decorations
     """
     if iopt==0:
         ax.set_xlabel(r'$\sin^2{\psi}$',dict(fontsize=ft))
@@ -106,4 +125,14 @@ def __deco__(ax,ft=15,iopt=0,ij=None):
     if iopt==3:
         ax.set_xlabel(r'$\bar{E}^{\mathrm{eff}}$',dict(fontsize=ft))
         ax.set_ylabel(r'$\bar{\Sigma}^{\mathrm{eff}}$',dict(fontsize=ft))
+
+    if iopt==4:
+        ax.set_xlabel(r'$\psi$',dict(fontsize=ft))
+        ax.set_ylabel(r'$d^{\mathrm{hkl}}$',
+                      dict(fontsize=ft))
+    if iopt==5:
+        ax.set_xlabel(r'$\psi$',dict(fontsize=ft))
+        ax.set_ylabel(r'$\varepsilon^{\mathrm{hkl}}$',
+                      dict(fontsize=ft))
+
     ax.grid('on')

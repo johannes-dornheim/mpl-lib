@@ -145,3 +145,14 @@ def tune_x_lim(axs,axis='x'):
     for i in range(len(axs)):
         if axis=='x': axs[i].set_xlim(X0,X1)
         if axis=='y': axs[i].set_ylim(X0,X1)
+
+
+def norm_cmap(mx,mn,val=None):
+    import matplotlib as mpl
+    import matplotlib.cm as cm
+    norm = mpl.colors.Normalize(vmin=mn,vmax=mx)
+    cmap = cm.gist_rainbow
+    m = cm.ScalarMappable(norm=norm, cmap=cmap)
+
+    if val==None: return cmap, m
+    else: return cmap, m.to_rgba(val)

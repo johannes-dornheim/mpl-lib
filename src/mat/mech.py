@@ -13,10 +13,13 @@ class FlowCurve:
         self.flag_6s    = np.zeros((6,))
         self.flag_6e    = np.zeros((6,))
 
+        self.is_stress_available = False
+        self.is_strain_available = False
+
     # voigt vectorial nomenclature (0 - 5)
         self.vo = [[0,0],[1,1],[2,2],[1,2],[0,1],[0,2]]
 
-        self.ivo = np.ones((3,3))
+        self.ivo = np.ones((3,3),dtype='int')
         for i in range(3):
             self.ivo[i,i] = i
 
@@ -35,12 +38,18 @@ class FlowCurve:
         equivalent scholar value that represents
         the full tensorial states
         """
-        self.get_energy()
-        self.get_vm_stress()
-        self.epsilon_vm = self.w/self.sigma_vm
+        if self.is_stress_available and \
+           self.is_strain_available:
+            self.get_energy()
+            self.get_vm_stress()
+            self.epsilon_vm = self.w/self.sigma_vm
 
-        print 'VM stress:', self.sigma_vm
-        print 'VM strain:', self.epsilon_vm
+            print 'VM stress:', self.sigma_vm
+            print 'VM strain:', self.epsilon_vm
+
+        elif self.is_stress_available and \
+             not (self.is_strain_available):
+            self.get_vm_strain()
 
     def get_energy(self):
         w = 0
@@ -83,6 +92,21 @@ class FlowCurve:
         vm = 3./2. * vm
         self.sigma_vm = np.sqrt(vm)
 
+    def get_vm_strain(self):
+        """
+        Note that VM strain should be calculated based on
+        energy conservation. However, there are times only
+        strain is available whereas stress isn't. This method
+        is intended to be used.
+        """
+        self.get_deviatoric_strain()
+        vm = 0.
+        for i in range(3):
+            for j in range(3):
+                vm = vm + self.epsilon_dev[i,j]**2
+        vm = 2./3. * vm
+        self.epsilon_vm = np.sqrt(vm)
+
     def plot(self,ifig=1):
         import matplotlib.pyplot as plt
         fig = plt.figure(ifig)
@@ -114,6 +138,7 @@ class FlowCurve:
         self.get_6strain(x=e_phl)
 
     def get_stress(self,x,i,j):
+        self.is_stress_available = True
         self.flag_sigma[i,j] = 1
         self.flag_6s[self.ivo[i,j]] = 1
         if len(x)>self.nstp:
@@ -122,6 +147,7 @@ class FlowCurve:
             self.sigma[i,j,k] = x[k]
 
     def get_strain(self,x,i,j):
+        self.is_strain_available = True
         self.flag_epsilon[i,j] = 1
         self.flag_6e[self.ivo[i,j]] = 1
         if len(x)>self.nstp:
@@ -133,6 +159,7 @@ class FlowCurve:
         """
         stress dimension: (6,nstp)
         """
+        self.is_stress_available = True
         self.flag_sigma[:,:] = 1
         self.flag_6s[:] = 1
         n = x.shape[-1]
@@ -147,6 +174,7 @@ class FlowCurve:
         """
         strain dimension: (6,nstp)
         """
+        self.is_strain_available = True
         self.flag_epsilon[:,:] = 1
         self.flag_6e[:] = 1
         n = x.shape[-1]
@@ -165,9 +193,60 @@ class FlowCurve:
         for i in range(3):
             for j in range(3):
                 self.get_strain(x[i,j],i,j)
+
+    def set_zero_sigma_ij(self,i,j):
+        self.set_zero_sigma_k(k=self.ivo[i,j])
+
+    def set_zero_epsilon_ij(self,i,j):
+        self.set_zero_epsilon_k(k=self.ivo[i,j])
+
+    def set_zero_sigma_k(self,k=None):
+        i,j = self.vo[k]
+        n = self.nstp
+        self.sigma[i,j,0:n] = 0
+        self.sigma[j,i,0:n] = 0
+
+    def set_zero_epsilon_k(self,k=None):
+        i,j = self.vo[k]
+        n = self.nstp
+        self.epsilon[i,j,0:n] = 0
+        self.epsilon[j,i,0:n] = 0
+
+    def set_zero_shear_strain(self):
+        for i in range(3):
+            for j in range(3):
+                if i!=j: self.set_zero_epsilon_ij(i,j)
+
+    def set_zero_shear_stress(self):
+        for i in range(3):
+            for j in range(3):
+                if i!=j: self.set_zero_sigma_ij(i,j)
+
     def check(self):
         if self.sigma.shape!=self.epsilon.shape:
             raise IOError, 'Flow data array size is not matched.'
+
+    def set_uni_axial(self):
+        self.get_stress([0,100,300,400,500],0,0)
+        self.set_zero_sigma_ij(1,1)
+        self.set_zero_sigma_ij(2,2)
+        self.set_zero_shear_stress()
+
+        self.get_strain([0,0.00001,0.002,0.05,0.015],0,0)
+        self.get_strain([0,-0.000003,-0.001,-0.025,-0.0075],1,1)
+        self.get_strain([0,-0.000003,-0.001,-0.025,-0.0075],2,2)
+        self.set_zero_shear_strain()
+
+    def set_bi_axial(self):
+        self.get_stress([0,100,300,400,500],0,0)
+        self.get_stress([0,100,300,400,500],1,1)
+        self.set_zero_sigma_ij(2,2)
+        self.set_zero_shear_stress()
+
+        self.get_strain([0,0.00001,0.002,0.05,0.015],0,0)
+        self.get_strain([0,-0.000003,-0.001,-0.025,-0.0075],1,1)
+        self.get_strain([0,-0.000003,-0.001,-0.025,-0.0075],2,2)
+        self.set_zero_shear_strain()
 
     def size(self,n):
         oldn = self.nstp
