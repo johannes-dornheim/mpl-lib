@@ -109,12 +109,9 @@ def wide_fig(
                 c = ws
                 fig.add_axes([a,b,c,d]) # w0, h0, w, h
                 cax=fig.axes[iax] # current axes
-
                 ticks_bins(ax=cax,axis='x',n=4)
                 ticks_bins(ax=cax,axis='y',n=4)
-
     return fig
-
 
 def axes3():
     import matplotlib.pyplot as plt

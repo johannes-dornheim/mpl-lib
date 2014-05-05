@@ -4,10 +4,10 @@ def __ehkl__(ax,ft=15,iopt=0):
     elastic strain (hkl) vs macroscopic flow
     """
     if iopt==0:
-        ax.set_xlabel(r'$\Sigma_{11}$',dict(fontsize=ft))
+        ax.set_xlabel(r'$\Sigma_{11}$ [MPa]',dict(fontsize=ft))
         ax.set_ylabel(r'$\varepsilon^{hkl}$',dict(fontsize=ft))
     elif iopt==1:
-        ax.set_ylabel(r'$\Sigma_{11}$',dict(fontsize=ft))
+        ax.set_ylabel(r'$\Sigma_{11}$ [MPa]',dict(fontsize=ft))
         ax.set_xlabel(r'$\varepsilon^{hkl}$',dict(fontsize=ft))
     elif iopt==2:
         ax.set_xlabel(r'$E_{11}$',dict(fontsize=ft))
@@ -23,9 +23,9 @@ def __ph__(ax,ft=15,iopt=0):
     """
     if iopt==0:
         ax.set_xlabel(r'$\varepsilon^{\mathrm{el}}$',dict(fontsize=ft))
-        ax.set_ylabel(r'$\Sigma_{11}$',dict(fontsize=ft))
+        ax.set_ylabel(r'$\Sigma_{11}$ [MPa]',dict(fontsize=ft))
     elif iopt==1:
-        ax.set_xlabel(r'$\Sigma_{11}$',dict(fontsize=ft))
+        ax.set_xlabel(r'$\Sigma_{11}$ [MPa]',dict(fontsize=ft))
         ax.set_xlabel(r'$\varepsilon^{\mathrm{el}}$',dict(fontsize=ft))
     elif iopt==2:
         ax.set_xlabel(r'$E_{11}$',dict(fontsize=ft))
@@ -37,7 +37,7 @@ def uni_sup(set_lab,ft,i,j,sup='eq',lab='sigma'):
     x label or y label
     """
     sup ='\mathrm{%s}'%sup
-    if lab=='sigma':   lab = r'$\Sigma^{%s}_{%i%i}$'%(sup,i,j)
+    if lab=='sigma':   lab = r'$\Sigma^{%s}_{%i%i}$ [MPa]'%(sup,i,j)
     if lab=='epsilon': lab= r'$E^{%s}_{%i%i}$'%(sup,i,j)
     set_lab(lab,dict(fontsize=ft))
 
@@ -73,7 +73,7 @@ def __unix__(ax,ft,i=1,j=1):
     uniaxial tension curve along stress(i,j) vs strain(i,j)
     """
     ax.set_xlabel(r'$\varepsilon_{%i%i}$'%(i,j),dict(fontsize=ft))
-    ax.set_ylabel(r'$\sigma_{%i%i}$'%(i,j),dict(fontsize=ft))
+    ax.set_ylabel(r'$\sigma_{%i%i}$ [MPa]'%(i,j),dict(fontsize=ft))
 
 def __vol__(ax,ft,i=1,j=1):
     """
@@ -84,8 +84,8 @@ def __vol__(ax,ft,i=1,j=1):
 
 def __plane__(ax,ft,iopt=0):
     if iopt==0:
-        xlab = r'$\Sigma_{RD}$'
-        ylab = r'$\Sigma_{TD}$'
+        xlab = r'$\Sigma_{RD}$ [MPa]'
+        ylab = r'$\Sigma_{TD}$ [MPa]'
     if iopt==1:
         xlab = r'$E_{RD}$'
         ylab = r'$E_{TD}$'
@@ -124,7 +124,7 @@ def __deco__(ax,ft=15,iopt=0,ij=None):
                       dict(fontsize=ft))
     if iopt==3:
         ax.set_xlabel(r'$\bar{E}^{\mathrm{eff}}$',dict(fontsize=ft))
-        ax.set_ylabel(r'$\bar{\Sigma}^{\mathrm{eff}}$',dict(fontsize=ft))
+        ax.set_ylabel(r'$\bar{\Sigma}^{\mathrm{eff}}$ [MPa]',dict(fontsize=ft))
 
     if iopt==4:
         ax.set_xlabel(r'$\psi$',dict(fontsize=ft))
