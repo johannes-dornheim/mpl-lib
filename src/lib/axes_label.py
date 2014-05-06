@@ -84,11 +84,11 @@ def __vol__(ax,ft,i=1,j=1):
 
 def __plane__(ax,ft,iopt=0):
     if iopt==0:
-        xlab = r'$\Sigma_{RD}$ [MPa]'
-        ylab = r'$\Sigma_{TD}$ [MPa]'
+        xlab = r'$\Sigma_\mathrm{RD}$ [MPa]'
+        ylab = r'$\Sigma_\mathrm{TD}$ [MPa]'
     if iopt==1:
-        xlab = r'$E_{RD}$'
-        ylab = r'$E_{TD}$'
+        xlab = r'$E_\mathrm{RD}$'
+        ylab = r'$E_\mathrm{TD}$'
     ax.set_xlabel(xlab,dict(fontsize=ft))
     ax.set_ylabel(ylab,dict(fontsize=ft))
     ax.grid('on')

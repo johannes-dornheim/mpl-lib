@@ -106,6 +106,7 @@ class FlowCurve:
                 vm = vm + self.epsilon_dev[i,j]**2
         vm = 2./3. * vm
         self.epsilon_vm = np.sqrt(vm)
+        self.nstp = len(self.epsilon_vm)
 
     def plot(self,ifig=1):
         import matplotlib.pyplot as plt

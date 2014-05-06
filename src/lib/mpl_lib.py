@@ -43,7 +43,8 @@ def wide_fig(
         left = 0.05, right = 0.02,
         nh=1,
         h0=0.2, hs=0.7, h1=0.1,
-        down = 0.05, up = 0.02, iarange=False):
+        down = 0.05, up = 0.02, iarange=False,
+        useOffset=False):
     """
     Make a figure that has horizontally aligned sub axes
 
@@ -95,6 +96,7 @@ def wide_fig(
                 c = ws
                 fig.add_axes([a,b,c,d]) # w0, h0, w, h
                 cax=fig.axes[iax] # current axes
+                cax.ticklabel_format(useOffset=useOffset)
 
                 ticks_bins(ax=cax,axis='x',n=4)
                 ticks_bins(ax=cax,axis='y',n=4)
@@ -144,12 +146,32 @@ def tune_x_lim(axs,axis='x'):
         if axis=='y': axs[i].set_ylim(X0,X1)
 
 
-def norm_cmap(mx,mn,val=None):
+def norm_cmap(mx,mn,val=None,cm_name='jet'):
+    """
+    cm_name = 'gist_rainbow'
+            = 'jet'
+    """
     import matplotlib as mpl
     import matplotlib.cm as cm
     norm = mpl.colors.Normalize(vmin=mn,vmax=mx)
-    cmap = cm.gist_rainbow
+
+    cmap = cm.get_cmap(cm_name)
+
     m = cm.ScalarMappable(norm=norm, cmap=cmap)
 
     if val==None: return cmap, m
     else: return cmap, m.to_rgba(val)
+
+def add_cb(ax,cmap=None,spacing='proportional',filled=True,
+           format='%3.1f',levels=None,colors=None,
+           ylab=None, xlab=None):
+    import matplotlib as mpl
+    import numpy as np
+    cb = mpl.colorbar.ColorbarBase(ax,cmap=cmap,spacing=spacing,
+                                   filled=filled,format=format)
+    if levels!=None:
+        cb.add_lines(levels=levels,colors=colors,linewidths=\
+                     np.ones(len(colors))*1.1,erase=True)
+
+    if ylab!=None: ax.set_ylabel(ylab)
+    if xlab!=None: ax.set_xlabel(xlab)
