@@ -50,7 +50,7 @@ def __eff__(ax,ft):
     ax.set_ylabel(r'Effective stress $\bar{\Sigma}^{\mathrm{eff}}$ [MPa]',
                   dict(fontsize=ft))
 
-def __eqv__(ax,ft):
+def __eqv__(ax,ft,zero_xy=True):
     """
     Equivalent strain, effective stress
     """
@@ -58,7 +58,7 @@ def __eqv__(ax,ft):
                   dict(fontsize=ft))
     ax.set_ylabel(r'Equivalent stress $\bar{\Sigma}$ [MPa]',
                   dict(fontsize=ft))
-    ax.set_xlim(0.,); ax.set_ylim(0.,)
+    if zero_xy: ax.set_xlim(0.,); ax.set_ylim(0.,)
     ax.grid('on')
 
 def __effr__(ax,ft):
