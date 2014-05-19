@@ -59,7 +59,7 @@ def __eqv__(ax,ft,zero_xy=True):
     ax.set_ylabel(r'Equivalent stress $\bar{\Sigma}$ [MPa]',
                   dict(fontsize=ft))
     if zero_xy: ax.set_xlim(0.,); ax.set_ylim(0.,)
-    ax.grid('on')
+    #ax.grid('on')
 
 def __effr__(ax,ft):
     ax.set_xlabel(r'Effective strain $\bar{E}^{\mathrm{eff}}$',
