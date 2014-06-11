@@ -44,8 +44,8 @@ class FlowCurve:
             self.get_vm_stress()
             self.epsilon_vm = self.w/self.sigma_vm
 
-            print 'VM stress:', self.sigma_vm
-            print 'VM strain:', self.epsilon_vm
+            # print 'VM stress:', self.sigma_vm
+            # print 'VM strain:', self.epsilon_vm
 
         elif self.is_stress_available and \
              not (self.is_strain_available):

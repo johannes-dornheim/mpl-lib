@@ -38,7 +38,7 @@ def rm_all_lab(ax):
         rm_lab(ax[i],axis='y')
 
 def wide_fig(
-        ifig=1,uw=2.8, uh=3,nw=5,
+        ifig=None,uw=2.8, uh=3,nw=5,
         w0=0.2, ws=0.7, w1=0.1,
         left = 0.05, right = 0.02,
         nh=1,
@@ -66,7 +66,7 @@ def wide_fig(
     l   : left spacing in the figure canvas
     r   : right spacing in the figure canvas
     """
-    fig = plt.figure(figsize=(uw*nw,uh*nh))
+    fig = plt.figure(ifig,figsize=(uw*nw,uh*nh))
 
     hsum = h0 + hs + h1
     h0 = h0/hsum; hs = hs/hsum; h1 = h1/hsum
@@ -145,6 +145,37 @@ def tune_x_lim(axs,axis='x'):
         if axis=='x': axs[i].set_xlim(X0,X1)
         if axis=='y': axs[i].set_ylim(X0,X1)
 
+def tune_x_lim_u(axs):
+    """
+    Tune x and y to match the maximum accounting for both
+    """
+    mx = None
+    mn = None
+    for i in range(len(axs)):
+        x0,x1 = axs[i].get_xlim()
+        y0,y1 = axs[i].get_ylim()
+
+        if mx==None:
+            if x1>=y1: mx=x1
+            if y1> x1: mx=y1
+        if mn==None:
+            if x0<=y0: mn = x0
+            if y1< y1: mn = y1
+
+        if x0<=y0: _xn_ = x0
+        if y0< x0: _xn_ = y0
+
+        if x1>=y1: _xm_ = x1
+        if y1> x1: _xm_ = y1
+
+        if _xn_<mn: mn = _xn_
+        if _xm_>mx: mx = _xm_
+
+    print mn, mx
+
+    for i in range(len(axs)):
+        axs[i].set_xlim(mn,mx)
+        axs[i].set_ylim(mn,mx)
 
 def norm_cmap(mx,mn,val=None,cm_name='jet'):
     """

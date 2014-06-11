@@ -102,6 +102,14 @@ def __plane__(ax,ft,iopt=0):
     ax.set_xlim(0.,mx)
     ax.set_ylim(0.,mx)
 
+def __deco_fld__(ax,ft=15,iopt=0):
+    if iopt==0:
+        ax.set_xlabel(r'$\bar{E}_2$')
+        ax.set_ylabel(r'$\bar{E}_1$')
+    elif iopt==1:
+        ax.set_xlabel(r'$\bar{\Sigma}_2$')
+        ax.set_ylabel(r'$\bar{\Sigma}_1$')
+
 def __deco__(ax,ft=15,iopt=0,ij=None):
     """
     diffraction plot decorations
