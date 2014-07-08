@@ -103,12 +103,20 @@ def __plane__(ax,ft,iopt=0):
     ax.set_ylim(0.,mx)
 
 def __deco_fld__(ax,ft=15,iopt=0):
+    ft = dict(fontsize=ft)
     if iopt==0:
-        ax.set_xlabel(r'$\bar{E}_2$')
-        ax.set_ylabel(r'$\bar{E}_1$')
+        ax.set_xlabel(r'$\mathrm{\bar{E}}_2$',ft)
+        ax.set_ylabel(r'$\mathrm{\bar{E}}_1$',ft)
     elif iopt==1:
-        ax.set_xlabel(r'$\bar{\Sigma}_2$')
-        ax.set_ylabel(r'$\bar{\Sigma}_1$')
+        ax.set_xlabel(r'$\bar{\Sigma}_2$ [MPa]',ft)
+        ax.set_ylabel(r'$\bar{\Sigma}_1$ [MPa]',ft)
+    elif iopt==2:
+        ax.set_xlabel(r'$\mathrm{\bar{E}}_\mathrm{TD}$',ft)
+        ax.set_ylabel(r'$\mathrm{\bar{E}}_\mathrm{RD}$',ft)
+    elif iopt==3:
+        ax.set_xlabel(r'$\bar{\Sigma}_\mathrm{TD}$ [MPa]',ft)
+        ax.set_ylabel(r'$\bar{\Sigma}_\mathrm{RD}$ [MPa]',ft)
+    ax.set_aspect('equal')
 
 def __deco__(ax,ft=15,iopt=0,ij=None):
     """
