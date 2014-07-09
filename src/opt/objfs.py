@@ -39,7 +39,7 @@ def BCC_c3_voce_sat(parameters=[80,70,340],
     """
     try: parameters = parameters.tolist()
     except:pass
-    parameters.append(0)
+    parameters.append(-10)
     return BCC_c3_voce(parameters=parameters,
                        exp_dat=exp_dat,
                        sx_fn = sx_fn)
