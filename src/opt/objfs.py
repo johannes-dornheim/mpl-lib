@@ -30,6 +30,22 @@ def BCC_uniax_voce(parameters=[80,70,340,20],
     mod_dat=[dat[2],dat[8]]
     return diff_two_curves(exp_dat,mod_dat)
 
+
+def BCC_c3_voce_sat(parameters=[80,70,340],
+                    exp_dat=[[0.0,0.1,0.2],[100,150,160]],
+                    sx_fn = 'dum'):
+    """
+    hard-wire thet1 = 0
+    """
+    try: parameters = parameters.tolist()
+    except:pass
+    parameters.append(0)
+    return BCC_c3_voce(parameters=parameters,
+                       exp_dat=exp_dat,
+                       sx_fn = sx_fn)
+
+
+
 def BCC_c3_voce(parameters=[80,70,340,20],
                    exp_dat=[[0.0,0.1,0.2],[100,150,160]],
                    sx_fn = 'dum'):

@@ -13,12 +13,12 @@ def BCC_voce(fn='B_ST_2k_tan_bul_rs.sx',
     fout=open(fnout,'w')
     for i in range(50):
         fout.write('%s\n'%lines[i])
-    fout.write(' %7.3f  %7.3f  %7.3f  %7.3f   0  0 \n'%(
+    fout.write(' %20.12e  %20.12e  %20.12e  %20.12e   0  0 \n'%(
             tau0,tau1,thet0,thet1))
     fout.write('%s \n'%lines[51])
     fout.write('%s \n'%lines[52])
     fout.write('%s \n'%lines[53])
-    fout.write(' %7.3f  %7.3f  %7.3f  %7.3f   0  0 \n'%(
+    fout.write(' %20.12e  %20.12e  %20.12e  %20.12e   0  0 \n'%(
             tau0,tau1,thet0,thet1))
     fout.write('%s \n'%lines[55])
     fout.close()
