@@ -102,7 +102,7 @@ def __plane__(ax,ft,iopt=0):
     ax.set_xlim(0.,mx)
     ax.set_ylim(0.,mx)
 
-def __deco_fld__(ax,ft=15,iopt=0):
+def __deco_fld__(ax,ft=15,iopt=0,iasp=True):
     ft = dict(fontsize=ft)
     if iopt==0:
         ax.set_xlabel(r'$\mathrm{\bar{E}}_2$',ft)
@@ -116,7 +116,8 @@ def __deco_fld__(ax,ft=15,iopt=0):
     elif iopt==3:
         ax.set_xlabel(r'$\bar{\Sigma}_\mathrm{TD}$ [MPa]',ft)
         ax.set_ylabel(r'$\bar{\Sigma}_\mathrm{RD}$ [MPa]',ft)
-    ax.set_aspect('equal')
+
+    if iasp:ax.set_aspect('equal')
 
 def __deco__(ax,ft=15,iopt=0,ij=None):
     """
