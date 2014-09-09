@@ -120,7 +120,13 @@ class FlowCurve:
         ax.legend(loc='best')
 
     def get_model(self,fn):
-        dat    = np.loadtxt(fn,skiprows=1).T
+        """
+        Read stress/strain data from VPSC/EVPSC format STR_STR.OUT
+        with an unknown number of head lines (typically 1)
+        """
+        ## determine nhead from fn
+        nhead = find_nhead(fn)
+        dat    = np.loadtxt(fn,skiprows=nhead).T
         strain = dat[2:8]
         stress = dat[8:14]
         self.get_6stress(x=stress)
@@ -321,6 +327,34 @@ def average_flow_curve(xs,ys,n=10):
         std.append(b)
 
     return x_ref, avg, std
+
+
+def find_nhead(fn='STR_STR.OUT'):
+    """
+    Find the number of 'string' heads on an array file
+
+    =========
+    Arguments
+    fn = 'STR_STR.OUT'
+
+    =======
+    Returns
+    The number of heads
+    """
+    f=open(fn,'r');lines=f.readlines();f.close()
+    nhead=0
+    success=False
+    while not(success):
+        try:
+            map(float,lines[nhead].split())
+        except ValueError:
+            nhead=nhead+1
+        else:
+            success=True
+    return nhead
+            
+"""
+"""
 
 class WPH:
     """
