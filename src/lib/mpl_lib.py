@@ -198,17 +198,20 @@ def add_cb(ax,cmap=None,spacing='proportional',filled=True,
            ylab=None, xlab=None,lw=4):
     import matplotlib as mpl
     import numpy as np
-    cb = mpl.colorbar.ColorbarBase(ax,cmap=cmap,spacing=spacing,
-                                   norm=norm,
-                                   filled=filled,format=format)
+    cb = mpl.colorbar.ColorbarBase(
+        ax,cmap=cmap,spacing=spacing,
+        norm=norm,filled=filled,format=format)
+    ## cb.set_ticks(np.arange(0,90.01,15))
     if levels!=None:
-        cb.add_lines(levels=levels,colors=colors,linewidths=\
-                         np.ones(len(colors))*lw,erase=True)
+        cb.add_lines(
+            levels=levels,colors=colors,
+            linewidths=np.ones(len(colors))*lw,
+            erase=True)
 
-    if ylab!=None: ax.set_ylabel(ylab)
+    if ylab!=None: ax.set_ylabel(ylab,dict(fontsize=15))
     if xlab!=None: ax.set_xlabel(xlab)
 
-
+    return cb
 
 # Topics: line, color, LineCollection, cmap, colorline, codex
 '''
