@@ -119,39 +119,61 @@ def __deco_fld__(ax,ft=15,iopt=0,iasp=True):
 
     if iasp:ax.set_aspect('equal')
 
-def __deco__(ax,ft=15,iopt=0,ij=None):
+def __deco__(ax,ft=15,iopt=0,ij=None,hkl=None,ipsi_opt=0):
     """
     diffraction plot decorations
     """
+    if ipsi_opt==0:   psi_xlab=r'$\sin^2{\psi}$'
+    elif ipsi_opt==1: psi_xlab=r'$\mathrm{sign}(\psi)$ $\sin^2{\psi} $'
+    elif ipsi_opt==2: psi_xlab=r'$\psi$'
+
+    if hkl==None: hkl='hkl'
     if iopt==0:
-        ax.set_xlabel(r'$\sin^2{\psi}$',dict(fontsize=ft))
-        ax.set_ylabel(r'$\varepsilon^{\mathrm{hkl}}$',
+        ax.set_xlabel(psi_xlab,dict(fontsize=ft))
+        ax.set_ylabel(r'$\varepsilon^{\mathrm{%s}} (\phi,\psi)$'%hkl,
                       dict(fontsize=ft))
     if iopt==1:
-        ax.set_xlabel(r'$\sin^2{\psi}$',dict(fontsize=ft))
+        ax.set_xlabel(psi_xlab,dict(fontsize=ft))
         if ij==None:
-            label = r'$F_{ij}$'
+            label = r'$F^{%s}_{\mathrm{ij}} (\phi,\psi)$ [$\mathrm{GPa^{-1}}$]'%hkl
         else:
-            label = r'$F_{%i%i}$'%(
-                ij[0],ij[1])
+            label = r'$F^{%s}_{%i%i} (\phi,\psi)$'%(
+                hkl,ij[0],ij[1])
+
         ax.set_ylabel(label,dict(fontsize=ft))
         #ax.set_ylim(-2,2)
 
     if iopt==2:
-        ax.set_xlabel(r'$\sin^2{\psi}$',dict(fontsize=ft))
-        ax.set_ylabel(r'$\varepsilon_{\mathrm{IG}}^{\mathrm{hkl}}$',
+        ax.set_xlabel(psi_xlab,dict(fontsize=ft))
+        ax.set_ylabel(r'$\varepsilon_{\mathrm{IG}}^{\mathrm{%s}} (\phi,\psi)$'%hkl,
                       dict(fontsize=ft))
-    if iopt==3:
+    elif iopt==3:
         ax.set_xlabel(r'$\bar{E}^{\mathrm{eff}}$',dict(fontsize=ft))
         ax.set_ylabel(r'$\bar{\Sigma}^{\mathrm{eff}}$ [MPa]',dict(fontsize=ft))
 
-    if iopt==4:
+    elif iopt==4:
         ax.set_xlabel(r'$\psi$',dict(fontsize=ft))
-        ax.set_ylabel(r'$d^{\mathrm{hkl}}$',
+        ax.set_ylabel(r'$d^{\mathrm{%s}} (\phi,\psi)$'%hkl,
                       dict(fontsize=ft))
-    if iopt==5:
+    elif iopt==5:
         ax.set_xlabel(r'$\psi$',dict(fontsize=ft))
-        ax.set_ylabel(r'$\varepsilon^{\mathrm{hkl}}$',
+        ax.set_ylabel(r'$\varepsilon^{\mathrm{%s}}$'%hkl,
                       dict(fontsize=ft))
-
+    elif iopt==6:
+        ax.set_xlabel(r'Equivalent strain $\bar{E}$',
+                      dict(fontsize=ft))
+        if ij==None:
+            label = r'$F^{%s}_{\mathrm{ij}} (\phi,\psi)$ [$\mathrm{GPa^{-1}}$]'%hkl
+        else:
+            label = r'$F^{%s}_{%i%i} (\phi,\psi)$'%(
+                hkl,ij[0],ij[1])
+        ax.set_ylabel(label,dict(fontsize=ft))
+    elif iopt==7:
+        ax.set_xlabel(psi_xlab,dict(fontsize=ft))
+        ax.set_ylabel(r'Volume Fraction $(\phi,\psi)$',dict(fontsize=ft))
+    elif iopt==8:
+        ax.set_xlabel(r'Equivalent strain $\bar{E}$',
+                      dict(fontsize=ft))
+        ylabel_err =r'$(\bar{\Sigma}_\mathrm{w} -\Sigma_\mathrm{d})_{\mathrm{VM}}/(\bar{\Sigma}_\mathrm{w})_{\mathrm{VM}}$'
+        ax.set_ylabel(ylabel_err,dict(fontsize=ft))
     ax.grid('on')

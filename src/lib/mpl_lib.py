@@ -38,10 +38,9 @@ def rm_all_lab(ax):
         rm_lab(ax[i],axis='y')
 
 def wide_fig(
-        ifig=None,uw=2.8, uh=3,nw=5,
+        ifig=None,uw=2.8, uh=3,nw=5, nh=1,nfig=None,
         w0=0.2, ws=0.7, w1=0.1,
         left = 0.05, right = 0.02,
-        nh=1,
         h0=0.2, hs=0.7, h1=0.1,
         down = 0.05, up = 0.02, iarange=False,
         useOffset=False):
@@ -94,12 +93,13 @@ def wide_fig(
                 iax=iax+1
                 a = left + w0 + dw * i
                 c = ws
-                fig.add_axes([a,b,c,d]) # w0, h0, w, h
-                cax=fig.axes[iax] # current axes
-                cax.ticklabel_format(useOffset=useOffset)
-
-                ticks_bins(ax=cax,axis='x',n=4)
-                ticks_bins(ax=cax,axis='y',n=4)
+                if nfig!=None and nfig==len(fig.axes): pass
+                else:
+                    fig.add_axes([a,b,c,d]) # w0, h0, w, h
+                    cax=fig.axes[iax] # current axes
+                    cax.ticklabel_format(useOffset=useOffset)
+                    ticks_bins(ax=cax,axis='x',n=4)
+                    ticks_bins(ax=cax,axis='y',n=4)
 
     elif iarange:
         for j in range(nh):
@@ -109,10 +109,13 @@ def wide_fig(
                 iax=iax+1
                 a = left + w0 + dw * i
                 c = ws
-                fig.add_axes([a,b,c,d]) # w0, h0, w, h
-                cax=fig.axes[iax] # current axes
-                ticks_bins(ax=cax,axis='x',n=4)
-                ticks_bins(ax=cax,axis='y',n=4)
+                if nfig!=None and nfig==len(fig.axes): pass
+                else:
+                    fig.add_axes([a,b,c,d]) # w0, h0, w, h
+                    cax=fig.axes[iax] # current axes
+                    ticks_bins(ax=cax,axis='x',n=4)
+                    ticks_bins(ax=cax,axis='y',n=4)
+
     return fig
 
 def axes3():
@@ -122,76 +125,65 @@ def axes3():
     ax=fig.add_subplot(111, projection='3d')
     return ax
 
-
 def tune_xy_lim(axs):
+    """ tune both x and y """
     tune_x_lim(axs,axis='x')
     tune_x_lim(axs,axis='y')
 
-
 def tune_x_lim(axs,axis='x'):
-    """
-    axis='x' or 'y'
-    """
+    """ mpl.axs,  axis='x' or 'y' """
     X0 = None; X1 = None
     for i in range(len(axs)):
         if axis=='x': x0,x1 = axs[i].get_xlim()
         if axis=='y': x0,x1 = axs[i].get_ylim()
-        if X0==None: X0=x0
-        if X1==None: X1=x1
-        if x0<X0:X0=x0
-        if x1>X1:X1=x1
-
+        if X0==None : X0=x0
+        if X1==None : X1=x1
+        if x0<X0    : X0=x0
+        if x1>X1    : X1=x1
     for i in range(len(axs)):
         if axis=='x': axs[i].set_xlim(X0,X1)
         if axis=='y': axs[i].set_ylim(X0,X1)
 
 def tune_x_lim_u(axs):
-    """
-    Tune x and y to match the maximum accounting for both
-    """
-    mx = None
-    mn = None
+    """ Tune x and y to match the maximum accounting for both """
+    mx = None; mn = None
     for i in range(len(axs)):
         x0,x1 = axs[i].get_xlim()
         y0,y1 = axs[i].get_ylim()
-
         if mx==None:
             if x1>=y1: mx=x1
             if y1> x1: mx=y1
         if mn==None:
             if x0<=y0: mn = x0
             if y1< y1: mn = y1
-
         if x0<=y0: _xn_ = x0
         if y0< x0: _xn_ = y0
-
         if x1>=y1: _xm_ = x1
         if y1> x1: _xm_ = y1
-
         if _xn_<mn: mn = _xn_
         if _xm_>mx: mx = _xm_
-
-    print mn, mx
-
     for i in range(len(axs)):
         axs[i].set_xlim(mn,mx)
         axs[i].set_ylim(mn,mx)
 
 def norm_cmap(mx,mn,val=None,cm_name='jet'):
     """
+    Arguments
+    =========
+    mx
+    mn
+    val
     cm_name = 'gist_rainbow'
             = 'jet'
     """
-    import matplotlib as mpl
+    import matplotlib    as mpl
     import matplotlib.cm as cm
     norm = mpl.colors.Normalize(vmin=mn,vmax=mx)
-
     cmap = cm.get_cmap(cm_name)
-
-    m = cm.ScalarMappable(norm=norm, cmap=cmap)
-
+    m    = cm.ScalarMappable(norm=norm, cmap=cmap)
     if val==None: return cmap, m
     else: return cmap, m.to_rgba(val)
+    raise IOError
 
 def add_cb(ax,cmap=None,spacing='proportional',filled=True,
            format='%3.1f',levels=None,colors=None,norm=None,
@@ -208,9 +200,8 @@ def add_cb(ax,cmap=None,spacing='proportional',filled=True,
     if ylab!=None: ax.set_ylabel(ylab)
     if xlab!=None: ax.set_xlabel(xlab)
 
-
-
 # Topics: line, color, LineCollection, cmap, colorline, codex
+
 '''
 Defines a function colorline that draws a (multi-)colored 2D line with coordinates x and y.
 The color is taken from optional data in z, and creates a LineCollection.
@@ -231,47 +222,34 @@ import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib.colors import ListedColormap, BoundaryNorm
 
-
 # Data manipulation:
-
 def make_segments(x, y):
     '''
     Create list of line segments from x and y coordinates, in the correct format for LineCollection:
     an array of the form   numlines x (points per line) x 2 (x and y) array
     '''
-
     points = np.array([x, y]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
-
     return segments
 
-
 # Interface to LineCollection:
-
 def colorline(ax, x, y, z=None, cmap=plt.get_cmap('copper'), norm=plt.Normalize(0.0, 1.0), linewidth=3, alpha=1.0):
     '''
     Plot a colored line with coordinates x and y
     Optionally specify colors in the array z
     Optionally specify a colormap, a norm function and a line width
     '''
-
     # Default colors equally spaced on [0,1]:
     if z is None:
         z = np.linspace(0.0, 1.0, len(x))
-
     # Special case if a single number:
     if not hasattr(z, "__iter__"):  # to check for numerical input -- this is a hack
         z = np.array([z])
-
     z = np.asarray(z)
-
     segments = make_segments(x, y)
     lc = LineCollection(segments, array=z, cmap=cmap, norm=norm, linewidth=linewidth, alpha=alpha)
-
     ax.add_collection(lc)
-
     return lc
-
 
 def clear_frame(ax=None):
     # Taken from a post by Tony S Yu

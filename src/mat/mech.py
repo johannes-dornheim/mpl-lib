@@ -352,7 +352,25 @@ def find_nhead(fn='STR_STR.OUT'):
         else:
             success=True
     return nhead
-            
+
+def find_err(fa,fb):
+    """
+    Compare the two FlowCurve objects and return
+    errors at indivial plastic levels.
+    """
+    from MP.mat.mech import FlowCurve as FC
+    fd = FC()
+    if fa.nstp!=fb.nstp: raise IOError,\
+       'Number of data points are not matching'
+
+    fd_sigma = fa.sigma - fb.sigma
+    fd.get_33stress(fd_sigma)
+    fd.get_vm_stress()
+
+    ##fd.get_33strain(fa.epsilon)
+    ## fd.epsilon_vm = fa.epsilon_vm[::]
+
+    return (fd.sigma_vm) / fa.sigma_vm
 """
 """
 

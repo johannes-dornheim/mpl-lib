@@ -6,7 +6,8 @@ http://en.wikibooks.org/wiki/Algorithm_Implementation/Sorting/Shell_sort
 """
 import numpy as np
 def shellSort(a):
-    """Shell sort using Shell's (original) gap sequence: n/2, n/4, ..., 1."""
+    """Shell sort using Shell's (original)
+    gap sequence: n/2, n/4, ..., 1."""
     array = list(a)
     array = np.array(array)
     ind = np.arange(len(array))
@@ -30,7 +31,8 @@ def shellSort(a):
 
 def sh(array=None,*args):
     """
-    sort the given array and the sort the *args arrays according to
+    sort the given array and the sort
+    the *args arrays according to
     the sorting arangement taken on the array.
     """
     new_arrays = []
@@ -45,20 +47,20 @@ def sh(array=None,*args):
     return new_arrays
 
 def ind_swap(a,ind):
-    """
-    rearrange the order of array a in accordance with the given index
+    """ Rearrange the order of array a in
+    accordance with the given index
+
+    Arguments
+    =========
+    a   : array
+    ind : ind
     """
     import numpy as np
-    a = np.array(a); ind=np.array(ind)
+    a = np.array(a); ind = np.array(ind)
     if len(a)!=len(ind): raise IOError,'Wrong index...'
     old = list(a)
     old = np.array(old)
-    #new = np.zeros(old.shape)
     new = []
-
     for i in range(len(ind)):
         new.append(old[ind[i]])
     return np.array(new)
-
-
-
