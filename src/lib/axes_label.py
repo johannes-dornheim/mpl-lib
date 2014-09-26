@@ -61,6 +61,17 @@ def __eqv__(ax,ft,zero_xy=True):
     if zero_xy: ax.set_xlim(0.,); ax.set_ylim(0.,)
     #ax.grid('on')
 
+def __vm__(ax,ft,zero_xy=True):
+    """
+    Von Mises strain, Von Mises stress
+    """
+    ax.set_xlabel(r'Von Mises strain $\bar{E}^{\mathrm{VM}}$',
+                  dict(fontsize=ft))
+    ax.set_ylabel(r'Von Mises stress $\bar{\Sigma}^{\mathrm{VM}}$ [MPa]',
+                  dict(fontsize=ft))
+    if zero_xy: ax.set_xlim(0.,); ax.set_ylim(0.,)
+    #ax.grid('on')
+
 def __effr__(ax,ft):
     ax.set_xlabel(r'Effective strain $\bar{E}^{\mathrm{eff}}$',
                   dict(fontsize=ft))
@@ -107,9 +118,11 @@ def __deco_fld__(ax,ft=15,iopt=0,iasp=True):
     if iopt==0:
         ax.set_xlabel(r'$\mathrm{\bar{E}}_2$',ft)
         ax.set_ylabel(r'$\mathrm{\bar{E}}_1$',ft)
+        ax.set_ylim(0.,)
     elif iopt==1:
         ax.set_xlabel(r'$\bar{\Sigma}_2$ [MPa]',ft)
         ax.set_ylabel(r'$\bar{\Sigma}_1$ [MPa]',ft)
+        ax.set_xlim(0.,);ax.set_ylim(0.,)
     elif iopt==2:
         ax.set_xlabel(r'$\mathrm{\bar{E}}_\mathrm{TD}$',ft)
         ax.set_ylabel(r'$\mathrm{\bar{E}}_\mathrm{RD}$',ft)
