@@ -206,14 +206,14 @@ def add_cb(ax,cmap=None,spacing='proportional',filled=True,
         ax,cmap=cmap,spacing=spacing,
         norm=norm,filled=filled,format=format)
     ## cb.set_ticks(np.arange(0,90.01,15))
-    if levels!=None:
+    if type(levels)!=type(None):
         cb.add_lines(
             levels=levels,colors=colors,
             linewidths=np.ones(len(colors))*lw,
             erase=True)
 
-    if ylab!=None: ax.set_ylabel(ylab,dict(fontsize=15))
-    if xlab!=None: ax.set_xlabel(xlab)
+    if type(ylab)!=type(None): ax.set_ylabel(ylab,dict(fontsize=15))
+    if type(xlab)!=type(None): ax.set_xlabel(xlab)
 
     return cb
 
