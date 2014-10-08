@@ -1,8 +1,20 @@
 import matplotlib.pyplot as plt
 
-def fancy_legend(ax,loc='best',size=12):
-    ax.legend(loc=loc,fancybox=True, framealpha=0.5,
-              prop={'size':size})
+def fancy_legend(ax,loc='best',size=12,ncol=None):
+    """
+    MPL Legend with FancyBox
+    """
+    if type(ncol)==type(None):
+        ax.legend(
+            loc=loc,fancybox=True, framealpha=0.5,
+            prop={'size':size})
+    elif type(ncol).__name__=='int':
+        ax.legend(loc=loc,fancybox=True, framealpha=0.5,
+                  ncol=ncol,
+                  prop={'size':size})
+    else:
+        raise IOError, 'Unexpected type for ncol'
+
 
 def ticks_bins_ax_u(axes,n=4):
     ticks_bins_ax(axes,axis='x',n=n)
