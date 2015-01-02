@@ -148,9 +148,9 @@ def __deco__(ax,ft=15,iopt=0,ij=None,hkl=None,ipsi_opt=0):
     if iopt==1:
         ax.set_xlabel(psi_xlab,dict(fontsize=ft))
         if ij==None:
-            label = r'$F^{%s}_{\mathrm{ij}} (\phi,\psi)$ [$\mathrm{GPa^{-1}}$]'%hkl
+            label = r'$\mathbb{F}^{\{%s\},(\phi,\psi)}_{\mathrm{ij}} $ [$\mathrm{GPa^{-1}}$]'%hkl
         else:
-            label = r'$F^{%s}_{%i%i} (\phi,\psi)$'%(
+            label = r'$\mathbb{F}^{\{%s\}, (\phi,\psi)}_{%i%i}$'%(
                 hkl,ij[0],ij[1])
 
         ax.set_ylabel(label,dict(fontsize=ft))
@@ -176,7 +176,7 @@ def __deco__(ax,ft=15,iopt=0,ij=None,hkl=None,ipsi_opt=0):
         ax.set_xlabel(r'Equivalent strain $\bar{E}$',
                       dict(fontsize=ft))
         if ij==None:
-            label = r'$F^{%s}_{\mathrm{ij}} (\phi,\psi)$ [$\mathrm{GPa^{-1}}$]'%hkl
+            label = r'$F^{\{%s\},(\phi,\psi)}_{\mathrm{ij}} $ [$\mathrm{GPa^{-1}}$]'%hkl
         else:
             label = r'$F^{%s}_{%i%i} (\phi,\psi)$'%(
                 hkl,ij[0],ij[1])
@@ -189,4 +189,9 @@ def __deco__(ax,ft=15,iopt=0,ij=None,hkl=None,ipsi_opt=0):
                       dict(fontsize=ft))
         ylabel_err =r'$(\bar{\Sigma}_\mathrm{w} -\Sigma_\mathrm{d})_{\mathrm{VM}}/(\bar{\Sigma}_\mathrm{w})_{\mathrm{VM}}$'
         ax.set_ylabel(ylabel_err,dict(fontsize=ft))
+    elif iopt==9:
+        ax.set_xlabel(r'Equivalent strain $\bar{E}$',
+                      dict(fontsize=ft))
+        ylabel_err =r'Uncertainty $\mathbf{\sigma}^u_\mathrm{VM}$'
+        ax.set_ylabel(ylabel_err,dict(fontsize=ft))        
     ax.grid('on')
