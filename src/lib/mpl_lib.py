@@ -199,7 +199,7 @@ def norm_cmap(mx,mn,val=None,cm_name='jet'):
     raise IOError
 
 def add_cb(ax,cmap=None,spacing='proportional',filled=True,
-           format='%3.1f',levels=None,colors=None,norm=None,
+           format='%2i',levels=None,colors=None,norm=None,
            ylab=None, xlab=None,lw=4):
     import matplotlib as mpl
     import numpy as np
