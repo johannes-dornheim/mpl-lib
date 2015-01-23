@@ -1,18 +1,31 @@
 import matplotlib.pyplot as plt
 
 def fancy_legend(ax,loc='best',size=12,ncol=None,
-                 nscat=2):
+                 nscat=2,
+                 bbox_to_anchor=None):
     """
     MPL Legend with FancyBox
     """
     if type(ncol)==type(None):
-        ax.legend(
-            loc=loc,fancybox=True, framealpha=0.5,
-            prop={'size':size},numpoints=nscat)
+        if type(bbox_to_anchor)==type(None):
+            ax.legend(
+                loc=loc,fancybox=True, framealpha=0.5,
+                prop={'size':size},numpoints=nscat)
+        else:
+            ax.legend(
+                loc=loc,fancybox=True, framealpha=0.5,
+                prop={'size':size},numpoints=nscat,
+                bbox_to_anchor=bbox_to_anchor)
     elif type(ncol).__name__=='int':
-        ax.legend(loc=loc,fancybox=True, framealpha=0.5,
-                  ncol=ncol,numpoints=nscat,
-                  prop={'size':size})
+        if type(bbox_to_anchor)==type(None):
+            ax.legend(loc=loc,fancybox=True, framealpha=0.5,
+                      ncol=ncol,numpoints=nscat,
+                      prop={'size':size})
+        else:
+            ax.legend(loc=loc,fancybox=True, framealpha=0.5,
+                      ncol=ncol,numpoints=nscat,
+                      prop={'size':size},
+                      bbox_to_anchor=bbox_to_anchor)
     else:
         raise IOError, 'Unexpected type for ncol'
 
