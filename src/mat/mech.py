@@ -191,6 +191,23 @@ class FlowCurve:
             i,j = self.vo[k]
             self.epsilon[i,j,0:n] = x[k,0:n].copy()
             self.epsilon[j,i,0:n] = x[k,0:n].copy()
+    def add_6strstr(self,eps,sig):
+        """
+        Add a stack of 6D strain to existing ones
+        """
+        self.is_strain_available = True
+        self.is_stress_available = True
+        self.flag_epsilon[:,:] = 1
+        self.flag_sigma[:,:] = 1
+        self.flag_6e[:] = 1
+        self.nstp = self.nstp + 1
+        self.size(self.nstp)
+        for k in range(len(self.vo)):
+            i,j = self.vo[k]
+            self.epsilon[i,j,self.nstp] = eps[::].copy()
+            self.epsilon[j,i,self.nstp] = eps[::].copy()
+            self.sigma[i,j,self.nstp] = sig[::].copy()
+            self.sigma[j,i,self.nstp] = sig[::].copy()
 
     def get_33stress(self,x):
         for i in range(3):
