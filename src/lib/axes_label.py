@@ -176,7 +176,7 @@ def __deco__(ax,ft=15,iopt=0,ij=None,hkl=None,ipsi_opt=0):
         ax.set_ylabel(r'$\varepsilon^{\{%s\}}$'%hkl,
                       dict(fontsize=ft))
     elif iopt==6:
-        ax.set_xlabel(r'Von Mises Equivalent strain $\bar{E}$',
+        ax.set_xlabel(r'$\bar{E}^{VM}$',
                       dict(fontsize=ft))
         if ij==None:
             label = r'$\mathbb{F}^{\{%s\},(\phi,\psi)}_\mathrm{ij} $ [$\mathrm{GPa^{-1}}$]'%hkl
@@ -188,13 +188,16 @@ def __deco__(ax,ft=15,iopt=0,ij=None,hkl=None,ipsi_opt=0):
         ax.set_xlabel(psi_xlab,dict(fontsize=ft))
         ax.set_ylabel(r'Volume Fraction $(\phi,\psi)$',dict(fontsize=ft))
     elif iopt==8:
-        ax.set_xlabel(r'Von Mises Equivalent strain $\bar{E}$',
+        ax.set_xlabel(r'$\bar{E}^{VM}$',
                       dict(fontsize=ft))
         ylabel_err =r'$(\bar{\Sigma}_\mathrm{w} -\Sigma_\mathrm{d})_{\mathrm{VM}}/(\bar{\Sigma}_\mathrm{w})_{\mathrm{VM}}$'
         ax.set_ylabel(ylabel_err,dict(fontsize=ft))
     elif iopt==9:
-        ax.set_xlabel(r'Von Mises Equivalent strain $\bar{E}$',
+        ax.set_xlabel(r'$\bar{E}^{VM}$',
                       dict(fontsize=ft))
-        ylabel_err =r'Uncertainty $\mathbf{\sigma}^u_\mathrm{VM}$'
+        ## ylabel_err =r'Uncertainty $\mathbf{\sigma}^u_\mathrm{VM}$'
+        ## ylabel_err =r'$\bar{\sigma^e}-s^e<\sigma^e<\bar{\sigma^e}+s^e$'
+        ylabel_err =r'$\bar{\sigma^e}-s^e,\ \  \bar{\sigma^e}+s^e$'
+
         ax.set_ylabel(ylabel_err,dict(fontsize=ft))
     ax.grid('on')
