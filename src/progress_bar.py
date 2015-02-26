@@ -25,13 +25,14 @@ def update_progress(progress):
 
 def update_elapsed_time(second):
     time = 0 
+    unit='sec'
     if second<60.:
         unit='sec'
         time = second
-    if second>60. and second<3600:
+    if second>=60. and second<3600:
         unit='min'
         time =second/60.
-    if second>3600:
+    if second>=3600:
         unit='hour'
         time =second/3600.
     
