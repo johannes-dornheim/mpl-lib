@@ -1,8 +1,34 @@
 import matplotlib.pyplot as plt
 
-def fancy_legend(ax,loc='best',size=12):
-    ax.legend(loc=loc,fancybox=True, framealpha=0.5,
-              prop={'size':size})
+def fancy_legend(ax,loc='best',size=12,ncol=None,
+                 nscat=2,
+                 bbox_to_anchor=None):
+    """
+    MPL Legend with FancyBox
+    """
+    if type(ncol)==type(None):
+        if type(bbox_to_anchor)==type(None):
+            ax.legend(
+                loc=loc,fancybox=True, framealpha=0.5,
+                prop={'size':size},numpoints=nscat)
+        else:
+            ax.legend(
+                loc=loc,fancybox=True, framealpha=0.5,
+                prop={'size':size},numpoints=nscat,
+                bbox_to_anchor=bbox_to_anchor)
+    elif type(ncol).__name__=='int':
+        if type(bbox_to_anchor)==type(None):
+            ax.legend(loc=loc,fancybox=True, framealpha=0.5,
+                      ncol=ncol,numpoints=nscat,
+                      prop={'size':size})
+        else:
+            ax.legend(loc=loc,fancybox=True, framealpha=0.5,
+                      ncol=ncol,numpoints=nscat,
+                      prop={'size':size},
+                      bbox_to_anchor=bbox_to_anchor)
+    else:
+        raise IOError, 'Unexpected type for ncol'
+
 
 def ticks_bins_ax_u(axes,n=4):
     ticks_bins_ax(axes,axis='x',n=n)
@@ -186,7 +212,7 @@ def norm_cmap(mx,mn,val=None,cm_name='jet'):
     raise IOError
 
 def add_cb(ax,cmap=None,spacing='proportional',filled=True,
-           format='%3.1f',levels=None,colors=None,norm=None,
+           format='%2i',levels=None,colors=None,norm=None,
            ylab=None, xlab=None,lw=4):
     import matplotlib as mpl
     import numpy as np
@@ -194,14 +220,14 @@ def add_cb(ax,cmap=None,spacing='proportional',filled=True,
         ax,cmap=cmap,spacing=spacing,
         norm=norm,filled=filled,format=format)
     ## cb.set_ticks(np.arange(0,90.01,15))
-    if levels!=None:
+    if type(levels)!=type(None):
         cb.add_lines(
             levels=levels,colors=colors,
             linewidths=np.ones(len(colors))*lw,
             erase=True)
 
-    if ylab!=None: ax.set_ylabel(ylab,dict(fontsize=15))
-    if xlab!=None: ax.set_xlabel(xlab)
+    if type(ylab)!=type(None): ax.set_ylabel(ylab,dict(fontsize=15))
+    if type(xlab)!=type(None): ax.set_xlabel(xlab)
 
     return cb
 

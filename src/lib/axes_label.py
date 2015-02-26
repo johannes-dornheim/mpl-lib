@@ -102,6 +102,9 @@ def __plane__(ax,ft,iopt=0):
     if iopt==1:
         xlab = r'$E_\mathrm{RD}$'
         ylab = r'$E_\mathrm{TD}$'
+    if iopt==2:
+        xlab = r'$\Sigma_\mathrm{11}$ [MPa]'
+        ylab = r'$\Sigma_\mathrm{22}$ [MPa]'
     ax.set_xlabel(xlab,dict(fontsize=ft))
     ax.set_ylabel(ylab,dict(fontsize=ft))
     ax.grid('on')
@@ -143,14 +146,14 @@ def __deco__(ax,ft=15,iopt=0,ij=None,hkl=None,ipsi_opt=0):
     if hkl==None: hkl='hkl'
     if iopt==0:
         ax.set_xlabel(psi_xlab,dict(fontsize=ft))
-        ax.set_ylabel(r'$\varepsilon^{\mathrm{%s}} (\phi,\psi)$'%hkl,
+        ax.set_ylabel(r'$\varepsilon^{\{%s\},(\phi,\psi)}$ [$\mu$strain]'%hkl,
                       dict(fontsize=ft))
     if iopt==1:
         ax.set_xlabel(psi_xlab,dict(fontsize=ft))
         if ij==None:
-            label = r'$F^{%s}_{\mathrm{ij}} (\phi,\psi)$ [$\mathrm{GPa^{-1}}$]'%hkl
+            label = r'$\mathbb{F}^{\{%s\},(\phi,\psi)}_{\mathrm{ij}} $ [$\mathrm{GPa^{-1}}$]'%hkl
         else:
-            label = r'$F^{%s}_{%i%i} (\phi,\psi)$'%(
+            label = r'$\mathbb{F}^{\{%s\}, (\phi,\psi)}_{%i%i}$'%(
                 hkl,ij[0],ij[1])
 
         ax.set_ylabel(label,dict(fontsize=ft))
@@ -158,7 +161,7 @@ def __deco__(ax,ft=15,iopt=0,ij=None,hkl=None,ipsi_opt=0):
 
     if iopt==2:
         ax.set_xlabel(psi_xlab,dict(fontsize=ft))
-        ax.set_ylabel(r'$\varepsilon_{\mathrm{IG}}^{\mathrm{%s}} (\phi,\psi)$'%hkl,
+        ax.set_ylabel(r'$\varepsilon_{\mathrm{IG}}^{\{%s\}, (\phi,\psi)}\ [\mu]$ '%hkl,
                       dict(fontsize=ft))
     elif iopt==3:
         ax.set_xlabel(r'$\bar{E}^{\mathrm{eff}}$',dict(fontsize=ft))
@@ -166,27 +169,32 @@ def __deco__(ax,ft=15,iopt=0,ij=None,hkl=None,ipsi_opt=0):
 
     elif iopt==4:
         ax.set_xlabel(r'$\psi$',dict(fontsize=ft))
-        ax.set_ylabel(r'$d^{\mathrm{%s}} (\phi,\psi)$'%hkl,
+        ax.set_ylabel(r'$d^{\{%s\}} (\phi,\psi)$'%hkl,
                       dict(fontsize=ft))
     elif iopt==5:
         ax.set_xlabel(r'$\psi$',dict(fontsize=ft))
-        ax.set_ylabel(r'$\varepsilon^{\mathrm{%s}}$'%hkl,
+        ax.set_ylabel(r'$\varepsilon^{\{%s\}}$'%hkl,
                       dict(fontsize=ft))
     elif iopt==6:
-        ax.set_xlabel(r'Equivalent strain $\bar{E}$',
+        ax.set_xlabel(r'Von Mises Equivalent strain $\bar{E}$',
                       dict(fontsize=ft))
         if ij==None:
-            label = r'$F^{%s}_{\mathrm{ij}} (\phi,\psi)$ [$\mathrm{GPa^{-1}}$]'%hkl
+            label = r'$\mathbb{F}^{\{%s\},(\phi,\psi)}_\mathrm{ij} $ [$\mathrm{GPa^{-1}}$]'%hkl
         else:
-            label = r'$F^{%s}_{%i%i} (\phi,\psi)$'%(
+            label = r'$\mathbb{F}^{\{%s\},(\phi,\psi)}_{%i%i} $ [$\mathrm{GPa^{-1}}$]'%(
                 hkl,ij[0],ij[1])
         ax.set_ylabel(label,dict(fontsize=ft))
     elif iopt==7:
         ax.set_xlabel(psi_xlab,dict(fontsize=ft))
         ax.set_ylabel(r'Volume Fraction $(\phi,\psi)$',dict(fontsize=ft))
     elif iopt==8:
-        ax.set_xlabel(r'Equivalent strain $\bar{E}$',
+        ax.set_xlabel(r'Von Mises Equivalent strain $\bar{E}$',
                       dict(fontsize=ft))
         ylabel_err =r'$(\bar{\Sigma}_\mathrm{w} -\Sigma_\mathrm{d})_{\mathrm{VM}}/(\bar{\Sigma}_\mathrm{w})_{\mathrm{VM}}$'
+        ax.set_ylabel(ylabel_err,dict(fontsize=ft))
+    elif iopt==9:
+        ax.set_xlabel(r'Von Mises Equivalent strain $\bar{E}$',
+                      dict(fontsize=ft))
+        ylabel_err =r'Uncertainty $\mathbf{\sigma}^u_\mathrm{VM}$'
         ax.set_ylabel(ylabel_err,dict(fontsize=ft))
     ax.grid('on')
