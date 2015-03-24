@@ -192,7 +192,7 @@ def tune_x_lim_u(axs):
         axs[i].set_xlim(mn,mx)
         axs[i].set_ylim(mn,mx)
 
-def norm_cmap(mx,mn,val=None,cm_name='jet'):
+def norm_cmap(mx,mn,val=None,cm_name='jet',inorm=False):
     """
     Arguments
     =========
@@ -201,13 +201,15 @@ def norm_cmap(mx,mn,val=None,cm_name='jet'):
     val
     cm_name = 'gist_rainbow'
             = 'jet'
+    inorm
     """
     import matplotlib    as mpl
     import matplotlib.cm as cm
     norm = mpl.colors.Normalize(vmin=mn,vmax=mx)
     cmap = cm.get_cmap(cm_name)
     m    = cm.ScalarMappable(norm=norm, cmap=cmap)
-    if val==None: return cmap, m
+    if val==None and inorm==False: return cmap, m
+    if val==None and inorm==True:  return cmap, m, norm
     else: return cmap, m.to_rgba(val)
     raise IOError
 
@@ -216,6 +218,7 @@ def add_cb(ax,cmap=None,spacing='proportional',filled=True,
            ylab=None, xlab=None,lw=4):
     import matplotlib as mpl
     import numpy as np
+    if cmap==None: print 'Warning: color map was not specified.'
     cb = mpl.colorbar.ColorbarBase(
         ax,cmap=cmap,spacing=spacing,
         norm=norm,filled=filled,format=format)

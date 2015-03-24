@@ -19,23 +19,32 @@ def update_progress(progress):
         progress = 1
         status = "Done...\r\n"
     block = int(round(barLength*progress))
-    text = "\rPercent: [{0}] {1}% {2}".format( "#"*block + "-"*(barLength-block), progress*100, status)
+    text = "\rPercent: [{0}] {1}% {2}".format( "#"*block + "-"*(barLength-block),'%3.3i'%(progress*100), status)
     sys.stdout.write(text)
     sys.stdout.flush()
 
-def update_elapsed_time(second):
-    time = 0 
+def progress_line(head,dat,iflush=True):
+    text = "\r%s: %s [%s]"%(head,dat)
+    sys.stdout.write(text)
+    if iflush: sys.stdout.flush()
+
+def update_elapsed_time(second,iflush=True,head='Elapsed time'):
+    time = 0
     unit='sec'
     if second<60.:
-        unit='sec'
-        time = second
+        time = '%2.2i [sec]'%second
     if second>=60. and second<3600:
         unit='min'
-        time =second/60.
+        m = second/60.
+        s = second - int(m)*60.
+        time = '%2.2i [min] %2.2i [sec]'%(m,s)
     if second>=3600:
         unit='hour'
-        time =second/3600.
-    
-    text = "\rElapsed time: %3.2f [%s]"%(time,unit)
+        h = second/3600.
+        m = (second - int(h)*3600.)/60.
+        s = second - int(m) * 60. - int(h)*3600.
+        time = '%5.5i [hour] %2.2i [min] %2.2i [sec] '%(h,m,s)
+
+    text = "\r%s: %s"%(head,time)
     sys.stdout.write(text)
-    sys.stdout.flush()
+    if iflush: sys.stdout.flush()
