@@ -32,7 +32,7 @@ def update_elapsed_time(second,iflush=True,head='Elapsed time'):
     time = 0
     unit='sec'
     if second<60.:
-        time = '%2.2i [sec]'%second
+        time = '%5.2f [sec]'%second
     if second>=60. and second<3600:
         unit='min'
         m = second/60.
