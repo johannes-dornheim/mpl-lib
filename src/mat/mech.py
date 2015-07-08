@@ -1,4 +1,7 @@
 import numpy as np
+from scipy import integrate
+cumtrapz=integrate.cumtrapz
+
 class FlowCurve:
     """
     Flow characteristic in full 3x3 dimensions
@@ -52,6 +55,9 @@ class FlowCurve:
             self.get_vm_strain()
 
     def get_energy(self):
+        """
+        Integrate \int EijSij dEij
+        """
         w = 0
         for i in range(3):
             for j in range(3):
@@ -94,10 +100,14 @@ class FlowCurve:
 
     def get_vm_strain(self):
         """
-        Note that VM strain should be calculated based on
-        energy conservation. However, there are times only
-        strain is available whereas stress isn't. This method
-        is intended to be used.
+        Note that VM strain might be calculated based on
+        the principle of the plastic-work equivalence,
+        i.e., W = SijEij = S(VM) E(VM)
+
+        However, there are times only
+        strain is available whereas stress isn't thus
+        not able to calculate the 'work'
+        This function is intended to be used in such a case.
         """
         self.get_deviatoric_strain()
         vm = 0.
@@ -121,16 +131,61 @@ class FlowCurve:
 
     def get_model(self,fn):
         """
-        Read stress/strain data from VPSC/EVPSC format STR_STR.OUT
-        with an unknown number of head lines (typically 1)
+        Version 2015-06
+
+        Read STR_STR.OUT
+
+        Arguments
+        =========
+
+        Read "STR_STR.OUT" that might have 'intermediate headers'
         """
-        ## determine nhead from fn
-        nhead = find_nhead(fn)
-        dat    = np.loadtxt(fn,skiprows=nhead).T
-        strain = dat[2:8]
-        stress = dat[8:14]
-        self.get_6stress(x=stress)
-        self.get_6strain(x=strain)
+        epsilon=[]
+        sigma=[]
+        EVM=[]
+        SVM=[]
+        with open(fn) as f:
+            datl = f.read()
+            datl = datl.split('\n')
+            for i in xrange(len(datl)):
+                l=datl[i]
+                # print i,l
+                # raw_input()
+                if len(l)>2:
+                    try:
+                        dat = map(float,l.split())
+                    except:
+                        pass
+                    else:
+                        # dat = map(float,l.split())
+                        evm,svm=dat[0:2]
+                        EVM.append(evm)
+                        SVM.append(svm)
+                        strain=dat[2:8]
+                        stress=dat[8:14]
+                        epsilon.append(strain)
+                        sigma.append(stress)
+
+        self.get_6stress(x=np.array(sigma).T)
+        self.get_6strain(x=np.array(epsilon).T)
+        self.epsilon_vm = EVM[::]
+        self.sigma_vm=SVM[::]
+        self.w = cumtrapz(y=SVM,x=EVM)
+
+    # def get_model(self,fn):
+    #     """
+    #     Old version - deprecated.
+
+    #     Read stress/strain data from VPSC/EVPSC format STR_STR.OUT
+    #     with an unknown number of head lines (typically 1)
+    #     """
+    #     ## determine nhead from fn
+    #     nhead = find_nhead(fn)
+    #     dat    = np.loadtxt(fn,skiprows=nhead).T
+    #     strain = dat[2:8]
+    #     stress = dat[8:14]
+    #     self.get_6stress(x=stress)
+    #     self.get_6strain(x=strain)
 
     def get_pmodel(self,fn):
         dat    = np.loadtxt(fn,skiprows=1).T
@@ -254,6 +309,37 @@ class FlowCurve:
         self.get_strain([0,-0.000003,-0.001,-0.025,-0.0075],1,1)
         self.get_strain([0,-0.000003,-0.001,-0.025,-0.0075],2,2)
         self.set_zero_shear_strain()
+
+    def integrate_work(self):
+        """
+        Cumulative trapzoidal method to
+        calculate by integrating multidimensional (3x3)
+        stress-strain constitutive data
+
+        Advised to be used for 'experimental' data
+        """
+
+        if not(self.is_strain_available) or \
+           not(self.is_stress_available):
+            raise IOError, 'Either stress or strain is missing'
+
+        k=0
+        for i in range(3):
+            for j in range(3):
+                if self.flag_epsilon[i,j]==1 and \
+                   self.flag_sigma[i,j]==1:
+                    sij = self.sigma[i,j]
+                    eij = self.epsilon[i,j]
+
+                    if k==0: ## if first component available
+                        w = cumtrapz(sij,eij,initial=0)
+                    else:
+                        w = w + cumtrapz(sij,eij,initial=0)
+                    k=k+1
+                else:
+                    ## skip this component
+                    pass
+        self.work = w
 
     def size(self,n):
         """
@@ -408,3 +494,52 @@ class WPH:
             raise IOError, 'Flow curve and WPH array size'\
                 ' is not matched'
         self.nstp!=self.flow.nstp
+
+class PCYS:
+    def __init__(self):
+        """
+        How to represent a 'snapshot' of history?
+        """
+        self.fc=np.nan
+        self.tx=np.nan
+    def read_pcys(self,fn='PCYS.OUT'):
+        s1,s2,d1,d2=np.loadtxt(fn,skiprows=1).T
+        self.dat=np.array([s1,s2,d1,d2])
+    def read_fc(self,fc):
+        self.fc=fc
+    # def read_tx_fn(self,fn='TEX_PH1.OUT'):
+    #     pass
+
+def dev2pi(s1,s2):
+    """
+    Project the yield locus (s1,s2) in deviatoric pi-plane
+    to that in the plane-stress (s11,s22) with s33=0
+    following below:
+
+
+     s22-s11 = s1*sqrt(2)
+    -s22-s11 = s2*sqrt(6)
+    -------
+
+    -2 * s11 = s1*sqrt(2) + s2*sqrt(6)
+    s11 = -0.5 * (s1*sqrt(2)+s2*sqrt(6))
+    s22 = s11 + s1*sqrt(2)
+
+
+    Arguments
+    ---------
+    s1
+    s2
+    """
+    sq2 = np.sqrt(2.)
+    sq6 = np.sqrt(6.)
+
+    s11 = -0.5 * (s1*sq2 + s2*sq6)
+    s22 = s11 + s1*sq2
+    return s11, s22
+
+class PX_text:
+    def __init__(self):
+        pass
+    def read_tex(self,fn):
+        pass
