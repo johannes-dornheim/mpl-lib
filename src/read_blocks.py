@@ -14,6 +14,48 @@ def main(fn='STR_STR.OUT',skiprows=1):
     except ValueError:
         return rb(fn,skiprows)
 
+def read_tx(fn='TEX_PH1.OUT'):
+    """
+    Read a block of 'TEX_PH?.OUT'
+
+    Arguments
+    ---------
+    'TEX_PHT1.OUT'
+
+    Returns
+    -------
+    pxs   : pxs[nb,4,ngrs]
+    ngrs
+    """
+    f=open(fn,'r')
+    d=f.read()
+    blocks=d.split('B ')
+    blocks=blocks[1:]
+    nb=len(blocks)
+    px=[]
+
+    MXGR=0
+    ngrs=[]
+    for ib in xrange(nb):
+        b=blocks[ib]
+        ngr=int(b.split('\n')[0])
+        if ngr>MXGR:MXGR=ngr
+        ngrs.append(ngr)
+
+    pxs=np.zeros((nb,4,ngr))
+
+    for ib in xrange(nb):
+        b = blocks[ib]
+        lines = b.split('\n')
+        igr=0
+        for il in xrange(len(lines)):
+            grain=lines[il].split()
+            if len(grain)==4:
+                ph1,ph,ph2,wgt=map(float,grain)
+                pxs[ib,:,igr]=[ph1,ph,ph2,wgt]
+                igr=igr+1
+    return pxs,ngrs
+
 def rb(fn,skiprows):
     """
     """

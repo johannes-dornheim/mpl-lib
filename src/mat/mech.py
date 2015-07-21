@@ -323,7 +323,6 @@ class FlowCurve:
            not(self.is_stress_available):
             raise IOError, 'Either stress or strain is missing'
 
-        k=0
         for i in range(3):
             for j in range(3):
                 if self.flag_epsilon[i,j]==1 and \
@@ -331,11 +330,10 @@ class FlowCurve:
                     sij = self.sigma[i,j]
                     eij = self.epsilon[i,j]
 
-                    if k==0: ## if first component available
-                        w = cumtrapz(sij,eij,initial=0)
+                    if i+j==0: ## if first component available
+                        w = cumtrapz(y=sij,x=eij,initial=0)
                     else:
-                        w = w + cumtrapz(sij,eij,initial=0)
-                    k=k+1
+                        w = w + cumtrapz(y=sij,x=eij,initial=0)
                 else:
                     ## skip this component
                     pass
