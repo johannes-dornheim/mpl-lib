@@ -170,7 +170,7 @@ class FlowCurve:
         self.get_6strain(x=np.array(epsilon).T)
         self.epsilon_vm = EVM[::]
         self.sigma_vm=SVM[::]
-        self.w = cumtrapz(y=SVM,x=EVM)
+        self.w = cumtrapz(y=SVM,x=EVM,initial=0)
 
     # def get_model(self,fn):
     #     """
@@ -322,18 +322,18 @@ class FlowCurve:
         if not(self.is_strain_available) or \
            not(self.is_stress_available):
             raise IOError, 'Either stress or strain is missing'
-
+        k=0
         for i in range(3):
             for j in range(3):
                 if self.flag_epsilon[i,j]==1 and \
                    self.flag_sigma[i,j]==1:
                     sij = self.sigma[i,j]
                     eij = self.epsilon[i,j]
-
-                    if i+j==0: ## if first component available
+                    if k==0:
                         w = cumtrapz(y=sij,x=eij,initial=0)
                     else:
                         w = w + cumtrapz(y=sij,x=eij,initial=0)
+                    k=k+1
                 else:
                     ## skip this component
                     pass
