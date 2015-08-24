@@ -30,17 +30,16 @@ def progress_line(head,dat,iflush=True):
 
 def update_elapsed_time(second,iflush=True,head='Elapsed time'):
     time = 0.
-    if                     second<1.e-9:
+    if                     second<1.0e-9:
         time = '%8.3e  [second]'%time
-    elif second>=1.e-9 and second<1.e-6:
-        time = '%6.3f [ns]'%(second*1.0e-9)
+    elif second>=1.e-9 and second<1.0e-6:
+        time = '%3.0f [ns]'%(second/1.0e-9)
     elif second>=1.e-6 and second<1.0e-3:
-        time = '%6.3f [us]'%(second*1.0e-6)
-    elif second>=1.e-3 and second<1.0e0:
-        time = '%6.3f [ms]'%(second*1.0e-3)
-
+        time = '%3.0f [us]'%(second/1.0e-6)
+    elif second>=1.e-3 and second<1.0:
+        time = '%3.0f [ms]'%(second/1.0e-3)
     elif second>=1. and second<60:
-        time = '%6.3f [sec]'%second
+        time = '%3.0f [sec]'%second
     elif second>=60. and second<3600:
         m = second/60.
         s = second - int(m)*60.
