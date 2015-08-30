@@ -20,7 +20,7 @@ class FlowCurve:
         self.is_strain_available = False
 
     # Voigt vectorial nomenclature (0 - 5)
-        self.vo = [[0,0],[1,1],[2,2],[1,2],[0,1],[0,2]]
+        self.vo = [[0,0],[1,1],[2,2],[1,2],[0,2],[0,1]]
 
         self.ivo = np.ones((3,3),dtype='int')
         for i in range(3):
@@ -28,10 +28,10 @@ class FlowCurve:
 
         self.ivo[1,2] = 3
         self.ivo[2,1] = 3
-        self.ivo[0,1] = 4
-        self.ivo[1,0] = 4
-        self.ivo[0,2] = 5
-        self.ivo[2,0] = 5
+        self.ivo[0,2] = 4
+        self.ivo[2,0] = 4
+        self.ivo[0,1] = 5
+        self.ivo[1,0] = 5
 
         self.name = name
         self.descr = description
