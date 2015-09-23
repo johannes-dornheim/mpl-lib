@@ -3,25 +3,44 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 def main(fn='./IFsteel/dat/Hill48.txt',locus_xy=None,ths=[90,45,0]):
+    """
+    Find stress state that is corresponding to the given normals
+    in terms of its angles <ths>
+    """
     thetas = np.array(ths)*np.pi/180.
     X,Y,normals = read(fn,locus_xy)
     X_at_th = np.interp(thetas,normals,X)
     Y_at_th = np.interp(thetas,normals,Y)
     return X_at_th, Y_at_th
 
+def main_inv(fn='./IFsteel/dat/Hill48.txt',locus_xy=None,th=0):
+    """
+    Find normals of stress state corresponding to angles <ths> when
+    the locus is represented by a polar coordinate <r,th>
+    """
+    X, Y, normals = read(fn=fn,locus_xy=locus_xy)
+    normals = normals*180/np.pi
+    thetas = np.arctan2(Y,X)*180/np.pi ##
+    th=th*180/np.pi
+    _norm_ = np.interp(th, thetas, normals)
+    _X_    = np.interp(th, thetas, X)
+    _Y_    = np.interp(th, thetas, Y)
+    return _X_, _Y_, _norm_
+
 def read(fn='./IFsteel/dat/Hill48.txt',locus_xy=None):
+    """
+    """
     if type(locus_xy)==type(None):
         locus_xy = np.loadtxt(fn,skiprows=1,delimiter=',').T
     x,y = locus_xy
-    flt = []
-    for i in xrange(len(x)):
-        if x[i]>0 and y[i]>0:
-            flt.append(True)
-        else: flt.append(False)
-    flt=np.array(flt)
-    x=x[flt]; y=y[flt]
+    # flt = []
+    # for i in xrange(len(x)):
+    #     if x[i]>0 and y[i]>0:
+    #         flt.append(True)
+    #     else: flt.append(False)
+    # flt = np.array(flt)
+    # x   = x[flt]; y=y[flt]
     r,th=xy2rt(x,y)
     diffx = np.diff(x)
     diffy = np.diff(y)
@@ -67,7 +86,7 @@ def th_180(th):
     if th<-np.pi:
         th = th + np.pi*2
     return th
-    
+
 def xy2rt(x,y):
     th=np.arctan2(y,x)
     r=np.sqrt(x**2+y**2)
@@ -104,4 +123,3 @@ def ex(thetas=[0,45,90]):
     ## Actual
     x,y = np.cos(thetas),np.sin(thetas)
     ax.plot(x,y,'+')
-    
