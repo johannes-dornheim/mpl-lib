@@ -47,7 +47,9 @@ def convert_sec_to_string(second):
         h = second/3600.
         m = (second - int(h)*3600.)/60.
         s = second - int(m) * 60. - int(h)*3600.
-        time = '%5.5i [hour] %2.2i [min] %2.2i [sec] '%(h,m,s)
+        time = '%i [hr] %2.2i [min]'%(h,m)
+
+    time = '%17s'%time
     return time
 
 def update_elapsed_time(second,iflush=True,head='Elapsed time'):
