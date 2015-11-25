@@ -97,11 +97,11 @@ def __vol__(ax,ft,i=1,j=1):
 
 def __plane__(ax,ft,iopt=0):
     if iopt==0:
-        xlab = r'$\Sigma_\mathrm{RD}$ [MPa]'
-        ylab = r'$\Sigma_\mathrm{TD}$ [MPa]'
+        xlab = r'$\Sigma_\mathrm{11}$ [MPa]'
+        ylab = r'$\Sigma_\mathrm{22}$ [MPa]'
     if iopt==1:
-        xlab = r'$E_\mathrm{RD}$'
-        ylab = r'$E_\mathrm{TD}$'
+        xlab = r'$E_\mathrm{11}$'
+        ylab = r'$E_\mathrm{22}$'
     if iopt==2:
         xlab = r'$\Sigma_\mathrm{11}$ [MPa]'
         ylab = r'$\Sigma_\mathrm{22}$ [MPa]'
@@ -127,11 +127,11 @@ def __deco_fld__(ax,ft=15,iopt=0,iasp=True):
         ax.set_ylabel(r'$\bar{\Sigma}_1$ [MPa]',ft)
         ax.set_xlim(0.,);ax.set_ylim(0.,)
     elif iopt==2:
-        ax.set_xlabel(r'$\mathrm{\bar{E}}_\mathrm{TD}$',ft)
-        ax.set_ylabel(r'$\mathrm{\bar{E}}_\mathrm{RD}$',ft)
+        ax.set_xlabel(r'$\mathrm{\bar{E}}_\mathrm{22}$',ft)
+        ax.set_ylabel(r'$\mathrm{\bar{E}}_\mathrm{11}$',ft)
     elif iopt==3:
-        ax.set_xlabel(r'$\bar{\Sigma}_\mathrm{TD}$ [MPa]',ft)
-        ax.set_ylabel(r'$\bar{\Sigma}_\mathrm{RD}$ [MPa]',ft)
+        ax.set_xlabel(r'$\bar{\Sigma}_\mathrm{22}$ [MPa]',ft)
+        ax.set_ylabel(r'$\bar{\Sigma}_\mathrm{11}$ [MPa]',ft)
 
     if iasp:ax.set_aspect('equal')
 
