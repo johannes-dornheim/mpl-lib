@@ -30,7 +30,7 @@ def progress_line(head,dat,iflush=True):
 
 def convert_sec_to_string(second):
     if                     second<1.0e-9:
-        time = '%8.3e [sec]'%second
+        time = '%8.3f [sec]'%second
     elif second>=1.e-9 and second<1.0e-6:
         time = '%3.0f [ ns]'%(second/1.0e-9)
     elif second>=1.e-6 and second<1.0e-3:
