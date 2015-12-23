@@ -36,6 +36,45 @@ class FlowCurve:
         self.name = name
         self.descr = description
 
+    def Decompose_SA(self,a):
+        """
+        Decompose VG into sym and asym parts
+
+        Argument
+        --------
+        a (array in 3x3)
+
+        Returns
+        -------
+        sym
+        asym
+        """
+        sym  = 1./2. * (a+a.T)
+        asym = 1./2. * (a-a.T)
+        return sym, asym
+
+    def conv9_to_33(self,a):
+        """
+        array <a> in 9
+
+        Argument
+        --------
+        a  array
+        """
+        a=np.array(a)
+        if a.shape[0]!=9: raise IOError, 'array should be (9)'
+        b=np.zeros((3,3))
+        b[0,0] = a[0]
+        b[0,1] = a[1]
+        b[0,2] = a[2]
+        b[1,0] = a[3]
+        b[1,1] = a[4]
+        b[1,2] = a[5]
+        b[2,0] = a[6]
+        b[2,1] = a[7]
+        b[2,2] = a[8]
+        return b
+
     def get_eqv(self):
         """
         equivalent scholar value that represents
@@ -137,9 +176,11 @@ class FlowCurve:
 
         Arguments
         =========
+        fn
 
         Read "STR_STR.OUT" that might have 'intermediate headers'
         """
+        ncol=None
         epsilon=[]
         sigma=[]
         EVM=[]
@@ -149,14 +190,16 @@ class FlowCurve:
             datl = datl.split('\n')
             for i in xrange(len(datl)):
                 l=datl[i]
-                # print i,l
-                # raw_input()
                 if len(l)>2:
                     try:
                         dat = map(float,l.split())
                     except:
                         pass
                     else:
+                        if type(ncol)==type(None):
+                            ncol=len(dat)
+                            velgrads = []
+
                         # dat = map(float,l.split())
                         evm,svm=dat[0:2]
                         EVM.append(evm)
@@ -165,12 +208,24 @@ class FlowCurve:
                         stress=dat[8:14]
                         epsilon.append(strain)
                         sigma.append(stress)
+                        if ncol==24:
+                            tempr = dat[14]
+                            v33   = self.conv9_to_33(dat[15:24])
+                            velgrads.append(v33)
+                            # sr, w = self.Decompose_SA(v33)
 
         self.get_6stress(x=np.array(sigma).T)
         self.get_6strain(x=np.array(epsilon).T)
         self.epsilon_vm = EVM[::]
         self.sigma_vm=SVM[::]
         self.w = cumtrapz(y=SVM,x=EVM,initial=0)
+
+        if ncol==24:
+            self.velgrads = np.array(velgrads)
+            self.velgrads = self.velgrads.swapaxes(0,2).swapaxes(0,1)
+        else:
+            self.velgrads = None
+
 
     # def get_model(self,fn):
     #     """
