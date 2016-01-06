@@ -207,13 +207,12 @@ class FlowCurve:
                             else:
                                 raise IOError
 
-                            print datl[i-1]
+
                             ## Condition 2
                             # Previous line i-1 should exist
                             datl[i-1]
                             ## Condition 3
                             ## mappable by float
-                            #print datl[i-1]
                             dat = map(float,datl[i-1].split())
                             if len(dat)==0:
                                 raise IOError
@@ -241,9 +240,6 @@ class FlowCurve:
             if iopt==1:
                 ibreak=False
                 dat=map(float,datl[-2].split())
-                print '-'*10
-                print 'dat:'
-                print dat
 
                 evm,svm=dat[0:2]
                 EVM.append(evm)
