@@ -201,3 +201,44 @@ def __deco__(ax,ft=15,iopt=0,ij=None,hkl=None,ipsi_opt=0):
 
         ax.set_ylabel(ylabel_err,dict(fontsize=ft))
     ax.grid('on')
+
+
+
+
+## Borrowed from fld.py and fld_pp.py of VPSC-FLD
+
+def rho_transform(rho):
+    """
+    Rho transformation (rho<=1 or rho>1)
+
+    Argument
+    ========
+    rho
+    """
+    if rho<=1.: return rho
+    if rho>1: return -1 *(rho -1.) + 1
+
+def draw_guide(ax,r_line = [-0.5,0. ,1],max_r=2,
+               ls='--',color='k',alpha=0.5):
+    """
+    Maximum should be a radius...
+    """
+    import numpy as np
+    # guide lines for probed paths
+    xlim=ax.get_xlim(); ylim=ax.get_ylim()
+    for i in xrange(len(r_line)):
+        r = r_line[i]
+        if r<=1:
+            mx=max_r
+            mx = mx/np.sqrt(1.+r**2)
+            ys = np.linspace(0.,mx)
+            xs = r * ys
+        elif r>1:
+            r = rho_transform(r)
+            my = mx/np.sqrt(1.+r**2)
+            xs = np.linspace(0.,my)
+            ys = r * xs
+
+        ax.plot(xs,ys,ls=ls,color=color,alpha=alpha)
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)

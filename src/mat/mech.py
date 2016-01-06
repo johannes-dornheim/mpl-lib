@@ -168,7 +168,7 @@ class FlowCurve:
                         label='(%i,%i)'%(i+1,j+1))
         ax.legend(loc='best')
 
-    def get_model(self,fn):
+    def get_model(self,fn='STR_STR.OUT',iopt=0):
         """
         Version 2015-06
 
@@ -176,7 +176,9 @@ class FlowCurve:
 
         Arguments
         =========
-        fn
+        fn='STR_STR.OUT'
+        iopt=0 (Full history)
+            =1 (Records only at the end of each segment)
 
         Read "STR_STR.OUT" that might have 'intermediate headers'
         """
@@ -187,12 +189,34 @@ class FlowCurve:
         SVM=[]
         with open(fn) as f:
             datl = f.read()
-            datl = datl.split('\n')
+            datl = datl.split('\n') ## all the lines.
             for i in xrange(len(datl)):
                 l=datl[i]
                 if len(l)>2:
                     try:
-                        dat = map(float,l.split())
+                        if iopt==0:
+                            dat = map(float,l.split())
+                        if iopt==1:
+                            ## Condition 1
+                            # Current line (i) should be strings.
+                            dum = l.split()
+                            try:
+                                float(dum[0])
+                            except:
+                                pass
+                            else:
+                                raise IOError
+
+                            print datl[i-1]
+                            ## Condition 2
+                            # Previous line i-1 should exist
+                            datl[i-1]
+                            ## Condition 3
+                            ## mappable by float
+                            #print datl[i-1]
+                            dat = map(float,datl[i-1].split())
+                            if len(dat)==0:
+                                raise IOError
                     except:
                         pass
                     else:
@@ -214,6 +238,25 @@ class FlowCurve:
                             velgrads.append(v33)
                             # sr, w = self.Decompose_SA(v33)
 
+            if iopt==1:
+                ibreak=False
+                dat=map(float,datl[-2].split())
+                print '-'*10
+                print 'dat:'
+                print dat
+
+                evm,svm=dat[0:2]
+                EVM.append(evm)
+                SVM.append(svm)
+                strain=dat[2:8]
+                stress=dat[8:14]
+                epsilon.append(strain)
+                sigma.append(stress)
+                if ncol==24:
+                    tempr = dat[14]
+                    v33   = self.conv9_to_33(dat[15:24])
+                    velgrads.append(v33)
+
         self.get_6stress(x=np.array(sigma).T)
         self.get_6strain(x=np.array(epsilon).T)
         self.epsilon_vm = EVM[::]
@@ -225,22 +268,6 @@ class FlowCurve:
             self.velgrads = self.velgrads.swapaxes(0,2).swapaxes(0,1)
         else:
             self.velgrads = None
-
-
-    # def get_model(self,fn):
-    #     """
-    #     Old version - deprecated.
-
-    #     Read stress/strain data from VPSC/EVPSC format STR_STR.OUT
-    #     with an unknown number of head lines (typically 1)
-    #     """
-    #     ## determine nhead from fn
-    #     nhead = find_nhead(fn)
-    #     dat    = np.loadtxt(fn,skiprows=nhead).T
-    #     strain = dat[2:8]
-    #     stress = dat[8:14]
-    #     self.get_6stress(x=stress)
-    #     self.get_6strain(x=strain)
 
     def get_pmodel(self,fn):
         dat    = np.loadtxt(fn,skiprows=1).T
@@ -440,6 +467,12 @@ def __IsEqFlow__(a,b):
 def average_flow_curve(xs,ys,n=10):
     """
     Return average flow curve
+
+    Arguments
+    ---------
+    xs
+    ys
+    n
     """
     ndatset = len(xs)
     ## set proper x spacing
