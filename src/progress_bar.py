@@ -52,7 +52,7 @@ def convert_sec_to_string(second):
     time = '%17s'%time
     return time
 
-def update_elapsed_time(second,iflush=True,head='Elapsed time'):
+def update_elapsed_time(second,head='Elapsed time',iflush=True):
     time = convert_sec_to_string(second)
     text = "\r%s: %s"%(head,time)
     sys.stdout.write(text)
