@@ -1,3 +1,4 @@
+import numpy as np
 def smooth_slope(x,y,nbin=10):
     """
     A custom method to smooth a noisy data
