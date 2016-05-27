@@ -24,7 +24,7 @@ def find_tmp(verbose=True):
     return _tmp_
 
 
-def gen_tempfile(prefix='',affix='',ext='txt',i=0):
+def gen_tempfile(prefix='',affix='',ext='txt',i=0,tmp=None):
     """
     Generate temp file in _tmp_
 
@@ -37,7 +37,8 @@ def gen_tempfile(prefix='',affix='',ext='txt',i=0):
     """
     import os
     from etc import gen_hash_code2
-    _tmp_ = find_tmp(verbose=False)
+    if type(tmp).__name__=='NoneType':
+        tmp = find_tmp(verbose=False)
     exitCondition = False
     it = 0
     while not(exitCondition):
@@ -49,7 +50,7 @@ def gen_tempfile(prefix='',affix='',ext='txt',i=0):
             filename = '%s.%s'%(filename,ext)
 
         ## under the temp folder
-        filename = os.path.join(_tmp_,filename)
+        filename = os.path.join(tmp,filename)
 
         exitCondition = not(os.path.isfile(filename))
         it = it + 1
