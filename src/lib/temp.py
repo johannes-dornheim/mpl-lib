@@ -1,3 +1,10 @@
+"""
+Functions to generate temporary files and
+find a proper location to generate such files
+that are expected to be flushed - like /tmp/ folder
+in Unix/Linux
+"""
+
 def find_tmp(verbose=True):
     """
     Find the relevant temp folder
@@ -5,16 +12,19 @@ def find_tmp(verbose=True):
     The rule is if there's /data/
     create files there and run vpsc there.
 
+    Argument
+    --------
+    verbose = True
+
     Returns
     -------
     _tmp_
     """
     import os
-    ## Find /data/
+    ## Find local folder that allows fast I/O condition
     if os.path.isdir('/local_scratch/'): ## Palmetto@Clemson
         _tmp_ = '/local_scratch/'
     elif os.path.isdir('/data/'): ## CTCMS cluster@NIST
-        # _tmp_='/data/ynj/'
         _tmp_='/data/ynj/scratch/'
     else:
         _tmp_='/tmp/ynj/'
@@ -26,7 +36,9 @@ def find_tmp(verbose=True):
 
 def gen_tempfile(prefix='',affix='',ext='txt',i=0,tmp=None):
     """
-    Generate temp file in _tmp_
+    Generate temp file in _tmp_ folder.
+    Unless <tmp> argument is specified, the _tmp_ folder
+    is determined by <def find_tmp> function
 
     Arguments
     ---------
@@ -34,6 +46,12 @@ def gen_tempfile(prefix='',affix='',ext='txt',i=0,tmp=None):
     affix  = ''
     ext    = 'txt'  (extension, defualt: txt)
     i      : an integer to avoid duplicated name
+           (may be deprecated since gen_hash_code2 is used...)
+    tmp = None
+
+    Return
+    ------
+    filename
     """
     import os
     from etc import gen_hash_code2
@@ -42,7 +60,6 @@ def gen_tempfile(prefix='',affix='',ext='txt',i=0,tmp=None):
     exitCondition = False
     it = 0
     while not(exitCondition):
-        # hc = gen_hash_code(nchar=6,i=i+it)
         hc = gen_hash_code2(nchar=6)
         tmpLocation = find_tmp(verbose=False)
         filename = '%s-%s-%s'%(prefix,hc,affix)
@@ -51,9 +68,9 @@ def gen_tempfile(prefix='',affix='',ext='txt',i=0,tmp=None):
 
         ## under the temp folder
         filename = os.path.join(tmp,filename)
-
         exitCondition = not(os.path.isfile(filename))
         it = it + 1
+        if it>100: exitCondition=True
 
     if it>1:
         print('Warning: Oddly you just had'+\
