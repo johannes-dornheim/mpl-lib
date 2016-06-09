@@ -116,7 +116,21 @@ def __plane__(ax,ft,iopt=0):
     ax.set_xlim(0.,mx)
     ax.set_ylim(0.,mx)
 
+
+
 def __deco_fld__(ax,ft=15,iopt=0,iasp=True):
+    """
+    Arguments
+    ---------
+    ax  = matplotlib figure axis
+    ft  = fontsize
+    iopt determines choice of space
+       0: E1/E2
+       1: S1/S2
+       2: E11/E22
+       3: S11/S22
+    iasp= flag to set the aspect-ratio equal
+    """
     ft = dict(fontsize=ft)
     if iopt==0:
         ax.set_xlabel(r'$\mathrm{\bar{E}}_2$',ft)
@@ -135,6 +149,9 @@ def __deco_fld__(ax,ft=15,iopt=0,iasp=True):
 
     if iasp:ax.set_aspect('equal')
 
+# alias
+deco_fld = __deco_fld__
+
 def __deco__(ax,ft=15,iopt=0,ij=None,hkl=None,ipsi_opt=0):
     """
     diffraction plot decorations
@@ -143,14 +160,14 @@ def __deco__(ax,ft=15,iopt=0,ij=None,hkl=None,ipsi_opt=0):
     elif ipsi_opt==1: psi_xlab=r'$\mathrm{sign}(\psi)$ $\sin^2{\psi} $'
     elif ipsi_opt==2: psi_xlab=r'$\psi$'
 
-    if hkl==None: hkl='hkl'
+    if type(hkl)==type(None): hkl='hkl'
     if iopt==0:
         ax.set_xlabel(psi_xlab,dict(fontsize=ft))
         ax.set_ylabel(r'$\varepsilon^{\{%s\},(\phi,\psi)}$ [$\mu$strain]'%hkl,
                       dict(fontsize=ft))
     if iopt==1:
         ax.set_xlabel(psi_xlab,dict(fontsize=ft))
-        if ij==None:
+        if type(ij)==type(None):
             label = r'$\mathbb{F}^{\{%s\},(\phi,\psi)}_{\mathrm{ij}} $ [$\mathrm{GPa^{-1}}$]'%hkl
         else:
             label = r'$\mathbb{F}^{\{%s\}, (\phi,\psi)}_{%i%i}$'%(
@@ -178,7 +195,7 @@ def __deco__(ax,ft=15,iopt=0,ij=None,hkl=None,ipsi_opt=0):
     elif iopt==6:
         ax.set_xlabel(r'$\bar{E}^{VM}$',
                       dict(fontsize=ft))
-        if ij==None:
+        if type(ij)==type(None):
             label = r'$\mathbb{F}^{\{%s\},(\phi,\psi)}_\mathrm{ij} $ [$\mathrm{GPa^{-1}}$]'%hkl
         else:
             label = r'$\mathbb{F}^{\{%s\},(\phi,\psi)}_{%i%i} $ [$\mathrm{GPa^{-1}}$]'%(
@@ -201,8 +218,6 @@ def __deco__(ax,ft=15,iopt=0,ij=None,hkl=None,ipsi_opt=0):
 
         ax.set_ylabel(ylabel_err,dict(fontsize=ft))
     ax.grid('on')
-
-
 
 
 ## Borrowed from fld.py and fld_pp.py of VPSC-FLD
