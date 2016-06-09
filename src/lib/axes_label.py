@@ -129,6 +129,8 @@ def __deco_fld__(ax,ft=15,iopt=0,iasp=True):
        1: S1/S2
        2: E11/E22
        3: S11/S22
+       4: ERD/ETD
+       5: SRD/STD
     iasp= flag to set the aspect-ratio equal
     """
     ft = dict(fontsize=ft)
@@ -146,6 +148,12 @@ def __deco_fld__(ax,ft=15,iopt=0,iasp=True):
     elif iopt==3:
         ax.set_xlabel(r'$\bar{\Sigma}_\mathrm{22}$ [MPa]',ft)
         ax.set_ylabel(r'$\bar{\Sigma}_\mathrm{11}$ [MPa]',ft)
+    elif iopt==4:
+        ax.set_xlabel(r'$\mathrm{\bar{E}}_\mathrm{TD}$',ft)
+        ax.set_ylabel(r'$\mathrm{\bar{E}}_\mathrm{RD}$',ft)
+    elif iopt==5:
+        ax.set_xlabel(r'$\bar{\Sigma}_\mathrm{TD}$ [MPa]',ft)
+        ax.set_ylabel(r'$\bar{\Sigma}_\mathrm{RD}$ [MPa]',ft)
 
     if iasp:ax.set_aspect('equal')
 
