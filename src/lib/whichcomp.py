@@ -28,3 +28,17 @@ def guessWhereami():
     else:
         whereami ='unknown'
     return whereami
+
+
+## more environmental options
+def determineEnvironment(whereami=guessWhereami()):
+    if whereami=='palmetto':
+        submitCommand = 'qsub'
+    else:
+        submitCommand = None
+    from MP.lib import checkX
+    if checkX.main()!=0:
+        availX = False
+    else:
+        availX = True
+    return submitCommand, availX
