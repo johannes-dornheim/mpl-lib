@@ -1,3 +1,6 @@
+"""
+Functions to generate hash codes
+"""
 def gen_hash_code2(nchar=6):
     """
     Generate random hash tag (to mimick what mdtemp does)

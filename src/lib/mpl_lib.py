@@ -293,3 +293,23 @@ def clear_frame(ax=None):
     ax.yaxis.set_visible(False)
     for spine in ax.spines.itervalues():
         spine.set_visible(False)
+
+#-------------------------------------------------------------#
+def color_map(mn=0,mx=1.,cmap='viridis'):
+    """
+    Color mapper that linearly translates values in (mn,mx)
+    to colors determined by a chosen matplotlib color-map
+
+    Arguments
+    ---------
+    mn
+    mx
+    cmap
+
+    Return
+    ------
+    Color map function
+    """
+    cmap, m = norm_cmap(
+        mn=mn,mx=mx,cm_name=cmap)
+    return m.to_rgba

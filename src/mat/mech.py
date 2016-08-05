@@ -434,10 +434,77 @@ class FlowCurve:
         self.epsilon=newepsilon.copy()
 
 
+    def fit_hard(self,p0s,p0v,iplot):
+        """
+        Fit strain-hardening parameters
+
+        Arguments
+        ---------
+        p0s  - swift parameters
+        p0v  - voce  parameters
+        iplot
+        """
+        import mk.materials
+        func_swift=mk.materials.func_hard.func_swift
+        func_voce =mk.materials.func_hard.func_voce
+        # func_hm   =mk.materials.func_hard.func_hollomon
+
+        dat=[self.epsilon_vm, self.sigma_vm]
+        self.f_swift, self.p_swift, pcov_swift \
+            = mk.materials.func_hard_char.main(
+                exp_dat=dat,f_hard=func_swift,params=p0s)
+        self.f_voce,  self.p_voce,  pcov_voce \
+            = mk.materials.func_hard_char.main(
+                exp_dat=dat,f_hard=func_voce, params=p0v)
+
+        if iplot:
+            import matplotlib.pyplot as plt
+            fig=plt.figure();ax=fig.add_subplot(111)
+            x=np.linspace(self.epsilon_vm[0],self.epsilon_vm[1],100)
+            y_voce =self.f_voce(x)
+            y_swift=self.f_swift(x)
+
+            ax.plot(self.epsilon_vm,
+                    self.sigma_vm,'--',label='von Mises VPSC')
+            ax.plot(x,y_voce,':',label='Voce fit')
+            ax.plot(x,y_swift,'-.',label='Swift fit')
+            ax.legend()
+
+
 def true2engi(true_e,true_s):
+    """
+    Convert true stress/strain to engineering strains
+
+    Arguments
+    ---------
+    true_e
+    true_s
+    """
     engi_e = __truestrain2e__(true_e[::])
     engi_s = true_s/(1+engi_e)
     return engi_e, engi_s
+
+def engi_e2true_e(engi_e):
+    """
+    convert engineering strain to true strain.
+
+    Arguments
+    ---------
+    engi_e
+    """
+    epsilon_true = np.log(1+engi_e)
+    return epsilon_true
+
+def engi2true(engi_e,engi_s):
+    """
+    Convert engineering stress / strain to true stress and strain.
+    """
+    if (engi_e>=0).all() and (engi_s>=0).all():
+        epsilon_true = np.log(1+engi_e)
+        sigma_true   = engi_s * (1+engi_e)
+    else:
+        raise IOError, 'Unexpected case'
+    return epsilon_true, sigma_true
 
 def __truestrain2e__(e):
     """Convert true strain to that of engineering"""
