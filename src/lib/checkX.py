@@ -5,11 +5,12 @@ if ! xset q &>/dev/null; then
 fi
 exit 0
 """
-from temp import gen_tempfile
-import os
+# from temp import gen_tempfile
+import os, subprocess
 
 def main():
-    rst= os.system(checkX_sh)
+    # import temp.gen_tempfile
+    rst = os.system(checkX_sh)
     print 'rst:', rst
     return rst
 
