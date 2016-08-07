@@ -459,13 +459,14 @@ class FlowCurve:
             = mk.materials.func_hard_char.main(
                 exp_dat=dat,f_hard=func_voce, params=p0v)
 
-        a,b0,c,b1 = self.p_voce
-        k,eps_0,n = self.p_swift
-        m,qq = 5e-2, 1e3
-        self.f_voce_for  = mk.materials.func_hard_for.return_voce(
-            a=a,b0=b0,c=c,b1=b1,m=m,qq=qq)
-        self.f_swift_for = mk.materials.func_hard_for.return_swift(
-            n=n,m=5e-2,ks=k,e0=eps_0,qq=qq)
+        ## Cannot pickle fortran object yet, thus is not considered.
+        # a,b0,c,b1 = self.p_voce
+        # k,eps_0,n = self.p_swift
+        # m,qq = 5e-2, 1e3
+        # self.f_voce_for  = mk.materials.func_hard_for.return_voce(
+        #     a=a,b0=b0,c=c,b1=b1,m=m,qq=qq)
+        # self.f_swift_for = mk.materials.func_hard_for.return_swift(
+        #     n=n,m=5e-2,ks=k,e0=eps_0,qq=qq)
 
         if iplot:
             import matplotlib.pyplot as plt
