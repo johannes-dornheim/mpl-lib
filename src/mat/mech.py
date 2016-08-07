@@ -445,7 +445,7 @@ class FlowCurve:
         iplot
         """
         import mk.materials
-        import mk.materials.func_hard_for
+        # import mk.materials.func_hard_for
 
         func_swift=mk.materials.func_hard.func_swift
         func_voce =mk.materials.func_hard.func_voce
