@@ -433,7 +433,6 @@ class FlowCurve:
         self.sigma=newsigma.copy()
         self.epsilon=newepsilon.copy()
 
-
     def fit_hard(self,p0s,p0v,iplot):
         """
         Fit strain-hardening parameters
