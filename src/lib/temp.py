@@ -3,6 +3,15 @@ Functions to generate temporary files and
 find a proper location to generate such files
 that are expected to be flushed - like /tmp/ folder
 in Unix/Linux
+
+
+<find_tmp> finds and return the path meant for temporary I/O
+operations in several computating resources available to me.
+e.g., Palmetto or my Mac.
+
+<gen_tempfile> generates a filename suitable for temporary
+I/O operation. If <tmp> argument to <gen_tempfile> is not given
+it finds the suitable temp folder using <find_tmp>
 """
 
 def find_tmp(verbose=True):

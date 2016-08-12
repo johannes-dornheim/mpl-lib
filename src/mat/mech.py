@@ -703,8 +703,53 @@ def dev2pi(s1,s2):
     s22 = s11 + s1*sq2
     return s11, s22
 
-class PX_text:
-    def __init__(self):
-        pass
-    def read_tex(self,fn):
-        pass
+class Texture:
+    def __init__(self,fn):
+        self.read(fn)
+    def read(self,fn='TEX_PH1.OUT'):
+        """
+        Read texture file from VPSC and store necessary information...
+
+        - based on c_pf.py
+
+        Argument
+        --------
+        fn='TEX_PH1.OUT'
+        """
+        conts = open(fn, 'r').read()
+        blocks = conts.split('TEXTURE AT STRAIN =')
+        blocks = blocks[1::]
+
+        print 'number of snapshots:', len(blocks)
+
+        px  = [] ## polycrystal snapshot at each block
+        macroStrain = [] ## macro strain of each snapshot.
+        for i in range(len(blocks)):
+            lines = blocks[i].split('\n')
+            e = float(lines[0].split()[-1])
+            macroStrain.append(e)
+            linesOfGrains = lines[4:-1] # at each block
+            grains=[]
+            for eachLine in linesOfGrains:
+                gr=map(float,eachLine.split())
+                grains.append(gr)
+            px.append(grains)
+
+        self.px          = np.array(px)
+        self.macroStrain = np.array(macroStrain)
+
+    def plot(self,ib=0,csym='cubic',cdim=[1.,1.,1.],**kwargs):
+        """
+        Plot pole figures for the given snapshot id <ib>
+
+        Arguments
+        ---------
+        ib
+        csym
+        cdim
+        **kwargs passed to upf.pf_new
+        """
+        import TX.upf
+        mypf=TX.upf.polefigure(grains=self.px[ib],csym=csym,cdim=cdim)
+        fig=mypf.pf_new(**kwargs)
+        return fig
