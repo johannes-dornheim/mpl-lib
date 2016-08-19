@@ -71,7 +71,8 @@ def gen_tempfile(prefix='',affix='',ext='txt',i=0,tmp=None):
     while not(exitCondition):
         hc = gen_hash_code2(nchar=6)
         tmpLocation = find_tmp(verbose=False)
-        filename = '%s-%s-%s'%(prefix,hc,affix)
+        if len(affix)>0: filename = '%s-%s-%s'%(prefix,hc,affix)
+        else:            filename = '%s-%s'%(prefix,hc)
         if type(ext).__name__=='str':
             filename = '%s.%s'%(filename,ext)
 
