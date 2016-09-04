@@ -271,6 +271,7 @@ class FlowCurve:
             self.d33 = 0.5 * (v+vt)
             self.w33 = 0.5 * (v-vt)
             self.instR = self.d33[1,1]/self.d33[2,2]
+
     def get_pmodel(self,fn):
         dat    = np.loadtxt(fn,skiprows=1).T
         stress = dat[6:12]

@@ -8,6 +8,10 @@ def gen_hash_code2(nchar=6):
     Arguments
     ---------
     nchar=6
+
+    Returns
+    -------
+    random heshcode upto <nchar> characters
     """
     import os
     return os.urandom(16).encode('hex')[:nchar]
@@ -15,7 +19,9 @@ def gen_hash_code2(nchar=6):
 def gen_hash_code(nchar=6):
     """
     Deprecated by gen_hash_code2
+    ## deprecated
     """
+    print 'deprecated. Use gen_hash_code2'
     import hashlib
     ## -------------------------------------------------------
     ## Gen HASH code

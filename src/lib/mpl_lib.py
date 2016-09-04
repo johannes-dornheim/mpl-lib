@@ -202,6 +202,12 @@ def norm_cmap(mx,mn,val=None,cm_name='jet',inorm=False):
     cm_name = 'gist_rainbow'
             = 'jet'
     inorm
+
+    Returns
+    =======
+    1. if val!=None: return cmap, m.to_rgba(val)
+    2. if val==None and inorm==False, return cmap, m
+    3. if val==None and inorm==True , return cmap, m, norm
     """
     import matplotlib    as mpl
     import matplotlib.cm as cm

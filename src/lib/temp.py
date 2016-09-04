@@ -12,9 +12,12 @@ e.g., Palmetto or my Mac.
 <gen_tempfile> generates a filename suitable for temporary
 I/O operation. If <tmp> argument to <gen_tempfile> is not given
 it finds the suitable temp folder using <find_tmp>
+
+<gen_tempfolder> generates a folder suitable for temporary
+I/O operation similar to <gen_tempfile>
 """
 
-def find_tmp(verbose=True):
+def find_tmp(verbose=False):
     """
     Find the relevant temp folder
     in compliance with the CTCMS cluster policy,
@@ -23,7 +26,7 @@ def find_tmp(verbose=True):
 
     Argument
     --------
-    verbose = True
+    verbose = False
 
     Returns
     -------
@@ -42,6 +45,26 @@ def find_tmp(verbose=True):
     if verbose:print('_tmp_:%s'%_tmp_)
     return _tmp_
 
+def gen_tempfolder(prefix='',affix='',tmp=None):
+    """
+    Create temp folder using tempfile.mkdtemp
+
+    Arguments
+    ---------
+    prefix
+    affix
+    tmp    - tmp directory suitable for I/O
+             If not given, find one using <find_tmp>
+
+    Returns
+    -------
+    tempDirectory
+    """
+    import tempfile
+    if type(tmp).__name__=='NoneType':
+        tmp = find_tmp(verbose=False)
+
+    return tempfile.mkdtemp(prefix=prefix,suffix=affix,dir=tmp)
 
 def gen_tempfile(prefix='',affix='',ext='txt',i=0,tmp=None):
     """
