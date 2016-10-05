@@ -250,7 +250,7 @@ class FlowCurve:
                 stress=dat[8:14]
                 epsilon.append(strain)
                 sigma.append(stress)
-                if ncol==24:
+                if len(dat)>=24:
                     tempr = dat[14]
                     v33   = self.conv9_to_33(dat[15:24])
                     velgrads.append(v33)
