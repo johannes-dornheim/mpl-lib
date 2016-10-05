@@ -236,7 +236,7 @@ class FlowCurve:
                             tempr = dat[14]
                             v33   = self.conv9_to_33(dat[15:24])
                             velgrads.append(v33)
-                            tincrs.append(dat[25])
+                            tincrs.append(dat[24])
                             # sr, w = self.Decompose_SA(v33)
 
             if iopt==1:

@@ -19,6 +19,10 @@ I/O operation similar to <gen_tempfile>
 import os
 
 def find_writable(*paths):
+    """
+    Find and return a writable path among the given paths.
+    It returns the writable path as soon as it finds it.
+    """
     for path in paths:
         if os.access(path,os.W_OK):
             return path
@@ -26,7 +30,6 @@ def find_writable(*paths):
     print 'No writable folder found among the given list below'
     print paths
     raise IOError
-
 
 def find_tmp(verbose=False):
     """
