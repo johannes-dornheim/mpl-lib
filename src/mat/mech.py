@@ -187,6 +187,7 @@ class FlowCurve:
         sigma=[]
         EVM=[]
         SVM=[]
+        tincrs=[]
         with open(fn) as f:
             datl = f.read()
             datl = datl.split('\n') ## all the lines.
@@ -231,10 +232,11 @@ class FlowCurve:
                         stress=dat[8:14]
                         epsilon.append(strain)
                         sigma.append(stress)
-                        if ncol==24:
+                        if ncol>=24:
                             tempr = dat[14]
                             v33   = self.conv9_to_33(dat[15:24])
                             velgrads.append(v33)
+                            tincrs.append(dat[25])
                             # sr, w = self.Decompose_SA(v33)
 
             if iopt==1:
@@ -259,13 +261,14 @@ class FlowCurve:
         self.sigma_vm=SVM[::]
         self.w = cumtrapz(y=SVM,x=EVM,initial=0)
 
-        if ncol==24:
+        if ncol>=24:
             self.velgrads = np.array(velgrads)
             self.velgrads = self.velgrads.swapaxes(0,2).swapaxes(0,1)
+            self.tincrs = np.array(tincrs)
         else:
             self.velgrads = None
 
-        if ncol==24:
+        if ncol>=24:
             v  = self.velgrads.copy()
             vt = self.velgrads.swapaxes(0,1)
             self.d33 = 0.5 * (v+vt)

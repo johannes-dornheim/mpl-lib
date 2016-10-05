@@ -26,8 +26,8 @@ def drawE8(
     """
     import numpy as np
     A = tw/2. - gw/2.
-    th = -90-np.arccos((rd-A)/rd)*180/np.pi
-    x  = rd * np.sin(th)
+    th = -90.-np.arccos((rd-A)/rd)*180./np.pi
+    x  = rd * np.sin(th*np.pi/180.)
     ## Round...
     th0=-90
     th_delta=np.arccos((rd-A)/rd)*180/np.pi
@@ -120,15 +120,15 @@ def drawE8_Sketch(
     """
     import numpy as np
     A  = tw/2. - gw/2.
-    th = -90-np.arccos((rd-A)/rd)*180/np.pi
-    x  = rd * np.sin(th)
+    th = -90.-np.arccos((rd-A)/rd)*180./np.pi
+    x  = rd * np.sin(th*np.pi/180.)
 
     ## Round...
-    th0=-90
-    th_delta=np.arccos((rd-A)/rd)*180/np.pi
+    th0=-90.
+    th_delta=np.arccos((rd-A)/rd)*180./np.pi
     th1=th0+th_delta
     # ths=np.linspace(th0*np.pi/180.,th1*np.pi/180.)
-    ths=[th0,th1]
+    ths=np.array([th0,th1])*np.pi/180.
     xs = rd*np.cos(ths)
     ys = rd*np.sin(ths)
 
@@ -204,7 +204,7 @@ def main(pl=57,   ## Parallel length
     import matplotlib.pyplot as plt
     
     fig=plt.figure(figsize=(8,2.5))
-    xy=drawE8_Sketch(pl,gw,tw,tl,rd)
+    xy=drawE8_Sketch(pl=pl,gw=gw,tw=tw,tl=tl,rd=rd)
     xy[1,:] = xy[1,:]+tw/2.
     ## make the lower left corner (0,0)
 
@@ -230,4 +230,11 @@ def main(pl=57,   ## Parallel length
     print xyt
     plt.plot(xyt[0],xyt[1],'-r')
     plt.plot(xyt[0],xyt[1],'xb')
+
+
+    for i in xrange(len(XYS)):
+        x,y=XYS[i]
+        plt.text(x,y,'%i'%(i))
+
+
     return xyt
