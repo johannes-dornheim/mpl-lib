@@ -15,6 +15,10 @@ it finds the suitable temp folder using <find_tmp>
 
 <gen_tempfolder> generates a folder suitable for temporary
 I/O operation similar to <gen_tempfile>
+
+
+Youngung Jeong
+youngung.jeong@gmail.com
 """
 import os
 
@@ -51,7 +55,7 @@ def find_tmp(verbose=False):
     if os.path.isdir('/local_scratch/'): ## Palmetto@Clemson
         ## check if permission to write is available.
         _tmp_ = find_writable(
-            '/local/scracth','/scratch1/younguj','/scratch2/younguj',
+            '/local_scratch','/scratch1/younguj','/scratch2/younguj',
             '/scratch3/younguj')
 
     elif os.path.isdir('/data/'): ## CTCMS cluster@NIST
