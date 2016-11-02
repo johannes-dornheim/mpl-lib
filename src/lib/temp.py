@@ -15,10 +15,18 @@ it finds the suitable temp folder using <find_tmp>
 
 <gen_tempfolder> generates a folder suitable for temporary
 I/O operation similar to <gen_tempfile>
+
+
+Youngung Jeong
+youngung.jeong@gmail.com
 """
 import os
 
 def find_writable(*paths):
+    """
+    Find and return a writable path among the given paths.
+    It returns the writable path as soon as it finds it.
+    """
     for path in paths:
         if os.access(path,os.W_OK):
             return path
@@ -26,7 +34,6 @@ def find_writable(*paths):
     print 'No writable folder found among the given list below'
     print paths
     raise IOError
-
 
 def find_tmp(verbose=False):
     """
@@ -48,7 +55,7 @@ def find_tmp(verbose=False):
     if os.path.isdir('/local_scratch/'): ## Palmetto@Clemson
         ## check if permission to write is available.
         _tmp_ = find_writable(
-            '/local/scracth','/scratch1/younguj','/scratch2/younguj',
+            '/local_scratch','/scratch1/younguj','/scratch2/younguj',
             '/scratch3/younguj')
 
     elif os.path.isdir('/data/'): ## CTCMS cluster@NIST
