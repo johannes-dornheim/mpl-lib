@@ -11,7 +11,7 @@ import os, subprocess
 def main():
     # import temp.gen_tempfile
     rst = os.system(checkX_sh)
-    print 'rst:', rst
+    # print 'rst:', rst
     return rst
 
 if __name__=='__main__':
