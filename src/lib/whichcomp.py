@@ -1,5 +1,24 @@
 ## Find which computer I am on.
 import os
+pjoin = os.path.join
+
+def find_vpsc_repo():
+    """
+    Find path to VPSC repository
+    """
+    path_home = os.environ['HOME']
+    whereami = guessWhereami()
+
+    if   whereami=='palmetto':
+        path_vpsc=pjoin(path_home,'repo','vpsc-fld')
+    elif whereami=='mac':
+        path_vpsc=pjoin(path_home,'repo','vpsc','vpsc-dev-fld')
+    elif whereami=='mbp':
+        path_vpsc=pjoin(path_home,'repo','vpsc-fld-yld')
+    else:
+        raise IOError, 'Could not find vpsc repository'
+    return path_vpsc
+
 def clues():
     from platform import platform
     if platform()[:6]=='Darwin':
