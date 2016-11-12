@@ -1,4 +1,5 @@
 ## Find which computer I am on.
+import os
 def clues():
     from platform import platform
     if platform()[:6]=='Darwin':
@@ -15,11 +16,8 @@ def guessWhereami():
     if couldn't find, 'unknown' is returned.
     """
     ## add more IDs - locations all in lowercase
-    userIDs = dict(
-        younguj='palmetto',
-        yj='mac')
+    userIDs = dict(younguj='palmetto',yj='mac',youngung='mbp')
 
-    import os
     p = os.popen('whoami')
     whoami=p.read().split('\n')[0]
 
@@ -28,7 +26,6 @@ def guessWhereami():
     else:
         whereami ='unknown'
     return whereami
-
 
 ## more environmental options
 def determineEnvironment(whereami=guessWhereami()):
