@@ -109,6 +109,12 @@ def gen_tempfile(prefix='',affix='',ext='txt',i=0,tmp=None):
     """
     import os
     from etc import gen_hash_code2
+
+    if prefix=='':
+        prefix = gen_hash_code2(nchar=6)
+    if affix=='':
+        affix = gen_hash_code2(nchar=6)
+
     if type(tmp).__name__=='NoneType':
         tmp = find_tmp(verbose=False)
     exitCondition = False
