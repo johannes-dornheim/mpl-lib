@@ -9,11 +9,14 @@ def find_vpsc_repo():
     path_home = os.environ['HOME']
     whereami = guessWhereami()
 
+    ## test if repo/vpsc-fld-yld is present
     if   whereami=='palmetto':
         path_vpsc=pjoin(path_home,'repo','vpsc-fld')
     elif whereami=='mac':
         path_vpsc=pjoin(path_home,'repo','vpsc','vpsc-dev-fld')
     elif whereami=='mbp':
+        path_vpsc=pjoin(path_home,'repo','vpsc-fld-yld')
+    elif whereami=='ubuntu@mml':
         path_vpsc=pjoin(path_home,'repo','vpsc-fld-yld')
     else:
         raise IOError, 'Could not find vpsc repository'
@@ -35,13 +38,26 @@ def guessWhereami():
     if couldn't find, 'unknown' is returned.
     """
     ## add more IDs - locations all in lowercase
-    userIDs = dict(younguj='palmetto',yj='mac',youngung='mbp')
+    userIDs = dict(younguj='palmetto',yj='mac',youngung='mbp')#,yougnung='ubuntu@mml'
 
     p = os.popen('whoami')
     whoami=p.read().split('\n')[0]
-
+    print '-----------------'
+    print 'whoami:', whoami
+    print '-----------------'
     if whoami in userIDs.keys():
-        whereami = userIDs[whoami]
+        if whoami=='youngung': ## either my mbp or ubuntu@mml
+            path_home = os.environ['HOME']
+            if path_home==pjoin(os.sep,'Users','youngung'):
+                whereami='mbp'
+            elif path_home==pjoin(os.sep,'home','youngung'):
+                whereami='ubuntu@mml'
+            else:
+                print 'whoami:', whoami
+                print 'path_home:',path_home
+                raise IOError, 'Did not expect this case in whichcomp'
+        else:
+            whereami=userIDs[whoami]
     else:
         whereami ='unknown'
     return whereami
