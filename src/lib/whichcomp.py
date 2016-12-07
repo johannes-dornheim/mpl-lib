@@ -38,7 +38,7 @@ def guessWhereami():
     if couldn't find, 'unknown' is returned.
     """
     ## add more IDs - locations all in lowercase
-    userIDs = dict(younguj='palmetto',yj='mac',youngung='mbp')#,yougnung='ubuntu@mml'
+    userIDs = dict(younguj='palmetto',yj='mac',youngung='mbp',hwigeon='hg@ubuntu')#,yougnung='ubuntu@mml'
 
     p = os.popen('whoami')
     whoami=p.read().split('\n')[0]
