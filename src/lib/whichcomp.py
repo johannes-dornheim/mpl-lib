@@ -18,6 +18,8 @@ def find_vpsc_repo():
         path_vpsc=pjoin(path_home,'repo','vpsc-fld-yld')
     elif whereami=='ubuntu@mml':
         path_vpsc=pjoin(path_home,'repo','vpsc-fld-yld')
+    elif whereami=='hg@ubuntu':
+        path_vpsc=pjoin(path_home,'vpsc-fld-yld-postech')
     else:
         raise IOError, 'Could not find vpsc repository'
     return path_vpsc
