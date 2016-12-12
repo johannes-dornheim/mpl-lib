@@ -8,7 +8,9 @@ exit 0
 # from temp import gen_tempfile
 import os, subprocess
 
-def main(verbose=False):
+def main(verbose=True):
+    """
+    """
     import temp#.gen_tempfile
     fn_script = temp.gen_tempfile()
     fn_stdo   = temp.gen_tempfile()
@@ -19,7 +21,13 @@ def main(verbose=False):
 
     stdo = open(fn_stdo,'w')
     stde = open(fn_stde,'w')
-    rst = subprocess.check_call(['bash',fn_script],stdout=stdo,stderr=stde)
+
+    try:
+        rst = subprocess.check_call(['bash',fn_script],stdout=stdo,stderr=stde)
+    except:
+        rst=-1
+    else:
+        pass
 
     if verbose:
         print 'rst:',rst
