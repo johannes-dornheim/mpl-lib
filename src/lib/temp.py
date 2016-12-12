@@ -60,8 +60,13 @@ def find_tmp(verbose=False):
 
     elif os.path.isdir('/data/'): ## CTCMS cluster@NIST
         _tmp_='/data/ynj/scratch/'
-    else:
+    else: ##
         _tmp_='/tmp/'
+
+    ## Append user name
+    whoami = os.popen('whoami').read().split('\n')[0]
+    _tmp_ = os.path.join(_tmp_,whoami)
+
     if not(os.path.isdir(_tmp_)):
         os.mkdir(_tmp_)
     if verbose:print('_tmp_:%s'%_tmp_)
