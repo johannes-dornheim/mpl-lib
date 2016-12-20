@@ -55,7 +55,11 @@ def find_tmp(verbose=False):
 
     ## Find local folder that allows fast I/O condition
 
-    if os.path.isdir(os.path.join(userhome,'mnt','dummy')):
+    if os.path.isdir(os.path.join(os.sep,'scratch',username)):
+        _tmp_ = os.path.join(os.sep,'scratch',username)
+      date=os.popen('date +%Y%m%d_%H%M%S').read().split('\n')[0]
+        _tmp_ = os.path.join(_tmp_,date)
+    elif os.path.isdir(os.path.join(userhome,'mnt','dummy')):
         _tmp_ = os.path.join(userhome,'mnt','dummy')
     elif os.path.isdir(os.path.join(os.sep,'media','youngung','Maxtor Desktop','youngung_scratch')) and\
          username=='youngung':
@@ -75,7 +79,12 @@ def find_tmp(verbose=False):
             _tmp_='/tmp/'
             ## Append user name
         _tmp_ = os.path.join(_tmp_,username)
-
+        if not(os.path.isdir(_tmp_)):
+            os.mkdir(_tmp_)
+        date = os.popen('date +%Y%m%d_%H%M%S').read().split('\n')[0]
+        _tmp_ = os.path.join(_tmp_,date)
+        if not(os.path.isdir(_tmp_)):
+            os.mkdir(_tmp_)
 
     if not(os.path.isdir(_tmp_)):
         os.mkdir(_tmp_)
