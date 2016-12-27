@@ -26,10 +26,9 @@ def find_vpsc_repo():
 
 def clues():
     from platform import platform
-    if platform()[:6]=='Darwin':
-        return 'Darwin'
-    elif platform()[:5]=='Linux':
-        return 'Linux'
+    if platform()[:6]=='Darwin': return 'Darwin'
+    elif platform()[:5]=='Linux': return 'Linux'
+    raise IOError
 
 def guessWhereami():
     """
@@ -41,12 +40,8 @@ def guessWhereami():
     """
     ## add more IDs - locations all in lowercase
     userIDs = dict(younguj='palmetto',yj='mac',youngung='mbp',hwigeon='hg@ubuntu')#,yougnung='ubuntu@mml'
-
     p = os.popen('whoami')
     whoami=p.read().split('\n')[0]
-    print '-----------------'
-    print 'whoami:', whoami
-    print '-----------------'
     if whoami in userIDs.keys():
         if whoami=='youngung': ## either my mbp or ubuntu@mml
             path_home = os.environ['HOME']
@@ -55,13 +50,15 @@ def guessWhereami():
             elif path_home==pjoin(os.sep,'home','youngung'):
                 whereami='ubuntu@mml'
             else:
-                print 'whoami:', whoami
-                print 'path_home:',path_home
                 raise IOError, 'Did not expect this case in whichcomp'
+            pass
         else:
             whereami=userIDs[whoami]
+            pass
+        pass
     else:
         whereami ='unknown'
+        pass
     return whereami
 
 ## more environmental options

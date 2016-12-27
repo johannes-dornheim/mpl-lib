@@ -57,7 +57,7 @@ def find_tmp(verbose=False):
 
     if os.path.isdir(os.path.join(os.sep,'scratch',username)):
         _tmp_ = os.path.join(os.sep,'scratch',username)
-      date=os.popen('date +%Y%m%d_%H%M%S').read().split('\n')[0]
+        date=os.popen('date +%Y%m%d_%H%M%S').read().split('\n')[0]
         _tmp_ = os.path.join(_tmp_,date)
     elif os.path.isdir(os.path.join(userhome,'mnt','dummy')):
         _tmp_ = os.path.join(userhome,'mnt','dummy')
