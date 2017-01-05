@@ -50,46 +50,58 @@ def find_tmp(verbose=False):
     -------
     _tmp_
     """
-    username = os.popen('whoami').read().split('\n')[0]
-    userhome = os.environ['HOME']
-
-    ## Find local folder that allows fast I/O condition
-
-    if os.path.isdir(os.path.join(os.sep,'scratch',username)):
-        _tmp_ = os.path.join(os.sep,'scratch',username)
-        date=os.popen('date +%Y%m%d_%H%M%S').read().split('\n')[0]
-        _tmp_ = os.path.join(_tmp_,date)
-    elif os.path.isdir(os.path.join(userhome,'mnt','dummy')):
-        _tmp_ = os.path.join(userhome,'mnt','dummy')
-    elif os.path.isdir(os.path.join(os.sep,'media','youngung','Maxtor Desktop','youngung_scratch')) and\
-         username=='youngung':
-        _tmp_ = os.path.join(os.sep,'media','youngung','Maxtor Desktop','youngung_scratch')
-        date=os.popen('date +%Y%m%d_%H%M%S').read().split('\n')[0]
-        _tmp_ = os.path.join(_tmp_,date)
+    if os.environ.has_key('TMPDIR'):
+        _tmp_=os.environ['TMPDIR']
     else:
-        if os.path.isdir('/local_scratch/'): ## Palmetto@Clemson
-            ## check if permission to write is available.
-            _tmp_ = find_writable(
-                '/local_scratch','/scratch1/younguj','/scratch2/younguj',
-                '/scratch3/younguj')
+        _tmp_='/tmp/'
 
-        elif os.path.isdir('/data/'): ## CTCMS cluster@NIST
-            _tmp_='/data/ynj/scratch/'
-        else: ##
-            _tmp_='/tmp/'
-            ## Append user name
-        _tmp_ = os.path.join(_tmp_,username)
-        if not(os.path.isdir(_tmp_)):
-            os.mkdir(_tmp_)
-        date = os.popen('date +%Y%m%d_%H%M%S').read().split('\n')[0]
-        _tmp_ = os.path.join(_tmp_,date)
-        if not(os.path.isdir(_tmp_)):
-            os.mkdir(_tmp_)
+    date = os.popen('date +%Y%m%d_%H%M%S').read().split('\n')[0]
+    _tmp_ = os.path.join(_tmp_,date)
 
     if not(os.path.isdir(_tmp_)):
         os.mkdir(_tmp_)
-    if verbose:print('_tmp_:%s'%_tmp_)
     return _tmp_
+
+    # username = os.popen('whoami').read().split('\n')[0]
+    # userhome = os.environ['HOME']
+
+    # ## Find local folder that allows fast I/O condition
+
+    # if os.path.isdir(os.path.join(os.sep,'scratch',username)):
+    #     _tmp_ = os.path.join(os.sep,'scratch',username)
+    #     date=os.popen('date +%Y%m%d_%H%M%S').read().split('\n')[0]
+    #     _tmp_ = os.path.join(_tmp_,date)
+    # elif os.path.isdir(os.path.join(userhome,'mnt','dummy')):
+    #     _tmp_ = os.path.join(userhome,'mnt','dummy')
+    # elif os.path.isdir(os.path.join(os.sep,'media','youngung','Maxtor Desktop','youngung_scratch')) and\
+    #      username=='youngung':
+    #     _tmp_ = os.path.join(os.sep,'media','youngung','Maxtor Desktop','youngung_scratch')
+    #     date=os.popen('date +%Y%m%d_%H%M%S').read().split('\n')[0]
+    #     _tmp_ = os.path.join(_tmp_,date)
+    # else:
+    #     if os.path.isdir('/local_scratch/'): ## Palmetto@Clemson
+    #         ## check if permission to write is available.
+    #         _tmp_ = find_writable(
+    #             '/local_scratch','/scratch1/younguj','/scratch2/younguj',
+    #             '/scratch3/younguj')
+
+    #     elif os.path.isdir('/data/'): ## CTCMS cluster@NIST
+    #         _tmp_='/data/ynj/scratch/'
+    #     else: ##
+    #         _tmp_='/tmp/'
+    #         ## Append user name
+    #     _tmp_ = os.path.join(_tmp_,username)
+    #     if not(os.path.isdir(_tmp_)):
+    #         os.mkdir(_tmp_)
+    #     date = os.popen('date +%Y%m%d_%H%M%S').read().split('\n')[0]
+    #     _tmp_ = os.path.join(_tmp_,date)
+    #     if not(os.path.isdir(_tmp_)):
+    #         os.mkdir(_tmp_)
+
+    # if not(os.path.isdir(_tmp_)):
+    #     os.mkdir(_tmp_)
+    # if verbose:print('_tmp_:%s'%_tmp_)
+    # return _tmp_
 
 def gen_tempfolder(prefix='',affix='',tmp=None):
     """
