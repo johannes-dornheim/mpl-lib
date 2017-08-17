@@ -53,6 +53,28 @@ class FlowCurve:
         asym = 1./2. * (a-a.T)
         return sym, asym
 
+    def conv6_to_33(self,a):
+        """
+        Array <a> in 6 D
+
+        Argument
+        --------
+        a  Array
+        """
+        a=np.array(a)
+        if a.shape[0]!=6: raise IOError, 'Array should be (6)'
+        b=np.zeros((3,3))
+        b[0,0]=a[0] # 11
+        b[1,1]=a[1] # 22
+        b[2,2]=a[2] # 33
+        b[1,2]=a[3] # 23
+        b[2,1]=a[3]
+        b[0,2]=a[4] # 13
+        b[2,0]=a[4]
+        b[0,1]=a[5] # 12
+        b[1,0]=a[5]
+        return b
+
     def conv9_to_33(self,a):
         """
         array <a> in 9
@@ -168,6 +190,17 @@ class FlowCurve:
                         label='(%i,%i)'%(i+1,j+1))
         ax.legend(loc='best')
 
+    def plot_uni(self):
+        import matplotlib.pyplot as plt
+        fig = plt.figure(ifig)
+        ax1 = fig.add_subplot(121)
+        ax2 = fig.add_subplot(122)
+
+
+        ax1.plot(self.epsilon[0,0],self.sigma[0,0],'-')
+        ax2.plot(self.epsilon[0,0],self.instR,'-')
+
+
     def get_model(self,fn='STR_STR.OUT',iopt=0):
         """
         Version 2015-06
@@ -208,7 +241,6 @@ class FlowCurve:
                             else:
                                 raise IOError
 
-
                             ## Condition 2
                             # Previous line i-1 should exist
                             datl[i-1]
@@ -223,6 +255,9 @@ class FlowCurve:
                         if type(ncol)==type(None):
                             ncol=len(dat)
                             velgrads = []
+                            strain_el=[]
+                            strain_pl=[]
+                            strain_tr=[]
 
                         # dat = map(float,l.split())
                         evm,svm=dat[0:2]
@@ -232,12 +267,30 @@ class FlowCurve:
                         stress=dat[8:14]
                         epsilon.append(strain)
                         sigma.append(stress)
-                        if ncol>=24:
+                        if ncol==25: ## VPSC
+                            imod='VPSC'
                             tempr = dat[14]
                             v33   = self.conv9_to_33(dat[15:24])
                             velgrads.append(v33)
                             tincrs.append(dat[24])
                             # sr, w = self.Decompose_SA(v33)
+                        elif ncol==43: ## EVPSC
+                            imod='EVPSC'
+                            tempr = dat[14]
+                            eps_el = self.conv6_to_33(dat[15:21])
+                            eps_pl = self.conv6_to_33(dat[21:27])
+                            eps_tr = self.conv6_to_33(dat[27:33])
+                            v33    = self.conv9_to_33(dat[33:42])
+                            strain_el.append(eps_el)
+                            strain_pl.append(eps_pl)
+                            strain_tr.append(eps_tr)
+                            velgrads.append(v33)
+                            tincrs.append(dat[42])
+                        else:
+                            raise IOError,\
+                                'Unexpected number of columns found in data file'
+
+            print 'IMOD:', imod
 
             if iopt==1:
                 ibreak=False
@@ -250,10 +303,23 @@ class FlowCurve:
                 stress=dat[8:14]
                 epsilon.append(strain)
                 sigma.append(stress)
-                if len(dat)>=24:
+                if len(dat)==24: # vpsc
                     tempr = dat[14]
                     v33   = self.conv9_to_33(dat[15:24])
                     velgrads.append(v33)
+                elif ncol==43: # evpsc
+                    tempr = dat[14]
+                    eps_el = self.conv6_to_33(dat[15:21])
+                    eps_pl = self.conv6_to_33(dat[21:27])
+                    eps_tr = self.conv6_to_33(dat[27:33])
+                    v33    = self.conv9_to_33(dat[33:42])
+                    strain_el.append(eps_el)
+                    strain_pl.append(eps_pl)
+                    strain_tr.append(eps_tr)
+                    velgrads.append(v33)
+                else:
+                    raise IOError,\
+                        'Unexpected number of columns found in data file'
 
         self.get_6stress(x=np.array(sigma).T)
         self.get_6strain(x=np.array(epsilon).T)
@@ -261,14 +327,21 @@ class FlowCurve:
         self.sigma_vm=SVM[::]
         self.w = cumtrapz(y=SVM,x=EVM,initial=0)
 
-        if ncol>=24:
+        if imod=='VPSC':
             self.velgrads = np.array(velgrads)
             self.velgrads = self.velgrads.swapaxes(0,2).swapaxes(0,1)
             self.tincrs = np.array(tincrs)
-        else:
-            self.velgrads = None
+        elif imod=='EVPSC':
+            self.velgrads = np.array(velgrads)
+            self.velgrads = self.velgrads.swapaxes(0,2).swapaxes(0,1)
+            self.strain_el=np.array(strain_el)
+            self.strain_el = self.strain_el.swapaxes(0,2).swapaxes(0,1)
+            self.strain_pl=np.array(strain_pl)
+            self.strain_pl = self.strain_pl.swapaxes(0,2).swapaxes(0,1)
+            self.strain_tr=np.array(strain_tr)
+            self.strain_tr = self.strain_tr.swapaxes(0,2).swapaxes(0,1)
 
-        if ncol>=24:
+        if imod in ['VPSC','EVPSC']:
             v  = self.velgrads.copy()
             vt = self.velgrads.swapaxes(0,1)
             self.d33 = 0.5 * (v+vt)
