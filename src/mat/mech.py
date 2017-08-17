@@ -181,24 +181,36 @@ class FlowCurve:
 
     def plot(self,ifig=1):
         import matplotlib.pyplot as plt
-        fig = plt.figure(ifig)
-        ax = fig.add_subplot(111)
-        for k in range(6):
-            if self.flag_6e[k]==1 and self.flag_6s[k]==1:
-                i,j = self.vo[k]
-                ax.plot(self.epsilon[i,j],self.sigma[i,j],'-x',
-                        label='(%i,%i)'%(i+1,j+1))
-        ax.legend(loc='best')
+        if self.imod=='VPSC':
+            fig = plt.figure(ifig)
+            ax = fig.add_subplot(111)
+            for k in range(6):
+                if self.flag_6e[k]==1 and self.flag_6s[k]==1:
+                    i,j = self.vo[k]
+                    ax.plot(self.epsilon[i,j],self.sigma[i,j],'-x',
+                            label='(%i,%i)'%(i+1,j+1))
+            ax.legend(loc='best')
+
+        elif self.imod=='EVPSC':
+            fig = plt.figure(ifig,figsize=(9,4))
+            ax1=fig.add_subplot(121)
+            ax2=fig.add_subplot(122)
+
+            ax1.plot(self.epsilon[0,0],self.sigma[0,0],'-x',
+                     label='Flow Stress curve')
+            ax2.plot(self.epsilon[0,0],self.instR,label='R-value')
 
     def plot_uni(self):
         import matplotlib.pyplot as plt
-        fig = plt.figure(ifig)
+        fig = plt.figure()
         ax1 = fig.add_subplot(121)
         ax2 = fig.add_subplot(122)
 
+        x=self.epsilon[0,0]
+        y=self.sigma[0,0]
 
-        ax1.plot(self.epsilon[0,0],self.sigma[0,0],'-')
-        ax2.plot(self.epsilon[0,0],self.instR,'-')
+        x,y=flip(x,y,mode=0)
+        plt.plot(x,y)
 
 
     def get_model(self,fn='STR_STR.OUT',iopt=0):
@@ -268,14 +280,14 @@ class FlowCurve:
                         epsilon.append(strain)
                         sigma.append(stress)
                         if ncol==25: ## VPSC
-                            imod='VPSC'
+                            self.imod='VPSC'
                             tempr = dat[14]
                             v33   = self.conv9_to_33(dat[15:24])
                             velgrads.append(v33)
                             tincrs.append(dat[24])
                             # sr, w = self.Decompose_SA(v33)
                         elif ncol==43: ## EVPSC
-                            imod='EVPSC'
+                            self.imod='EVPSC'
                             tempr = dat[14]
                             eps_el = self.conv6_to_33(dat[15:21])
                             eps_pl = self.conv6_to_33(dat[21:27])
@@ -290,7 +302,7 @@ class FlowCurve:
                             raise IOError,\
                                 'Unexpected number of columns found in data file'
 
-            print 'IMOD:', imod
+            print 'IMOD:', self.imod
 
             if iopt==1:
                 ibreak=False
@@ -327,11 +339,11 @@ class FlowCurve:
         self.sigma_vm=SVM[::]
         self.w = cumtrapz(y=SVM,x=EVM,initial=0)
 
-        if imod=='VPSC':
+        if self.imod=='VPSC':
             self.velgrads = np.array(velgrads)
             self.velgrads = self.velgrads.swapaxes(0,2).swapaxes(0,1)
             self.tincrs = np.array(tincrs)
-        elif imod=='EVPSC':
+        elif self.imod=='EVPSC':
             self.velgrads = np.array(velgrads)
             self.velgrads = self.velgrads.swapaxes(0,2).swapaxes(0,1)
             self.strain_el=np.array(strain_el)
@@ -341,7 +353,7 @@ class FlowCurve:
             self.strain_tr=np.array(strain_tr)
             self.strain_tr = self.strain_tr.swapaxes(0,2).swapaxes(0,1)
 
-        if imod in ['VPSC','EVPSC']:
+        if self.imod in ['VPSC','EVPSC']:
             v  = self.velgrads.copy()
             vt = self.velgrads.swapaxes(0,1)
             self.d33 = 0.5 * (v+vt)
@@ -830,3 +842,88 @@ class Texture:
         mypf=TX.upf.polefigure(grains=self.px[ib],csym=csym,cdim=cdim)
         fig=mypf.pf_new(**kwargs)
         return fig
+
+
+
+
+
+
+
+
+
+
+
+
+
+def flip(l, e, mode=0):
+    """
+    If any load of the data is found to be negative,
+    mirror-flip the flow curve post to that negative point (self.mode==0)
+    or translate it to the original point (self.mode=1)
+
+    This will be called several times on a cyclic test result
+
+    Arguments
+    ---------
+    l  (load array)
+    e  (extension array)
+    mode (0: mirror-flip or 1:mirror-flip and translate it to origin)
+    """
+    import numpy as np
+    # self.mode= 0 or 1 (0 continuous, 1 translate to the origin)
+
+    load = np.array(l).copy()
+    ext  = np.array(e).copy()
+
+    ## Dict list data (deformation segment) ------------- ##
+    ext_dict  = dict()
+    load_dict = dict()
+    rvs_points = list()
+    ## -------------------------------------------------- ##
+    if len(load)!=len(ext): raise IOError
+
+    iseg = 0 ## segment labeling
+    rvs_points.append(0)
+    for i in range(len(load)):
+        if load[i]<0:
+            iseg = iseg + 1
+            rvs_points.append(i)
+            ## change of the load sign (crossed the border)
+            try:
+                x0 =  ext[i-1]; x1 =  ext[i]
+                y0 = load[i-1]; y1 = load[i]
+            ## Probably due to wrong index for ext or load
+            except: raise IOError, 'unexpected index problem'
+            else:
+                slope = (y1 - y0) / (x1 - x0)
+                ## mirror-flip
+                if mode==0:
+                    point = - y0 / slope + x0
+                    ext[i:len(ext)] = point + point - ext[i:len(ext)]
+                    load[i:len(load)] = - load[i:len(load)]
+                    pass
+                ## mirror-flip and translates to (0,0) point
+                elif mode==1:
+                    ## perform the flip! ------------------------- ##
+                    ext[i:] = - (ext[i:len(ext)] - ext[i])
+                    load[i:] = - load[i:len(load)]
+                    ## ------------------------------------------- ##
+
+                    ## dictionary type data for each segment ----- ##
+                    seg_start_ind = rvs_points[len(rvs_points)-2]
+                    seg_finish_ind = rvs_points[-1]
+                    # print seg_start_ind
+                    # print seg_finish_ind
+                    # print 'id: %i %i'%(seg_start_ind, seg_finish_ind)
+
+                    dict_name = '%s_seg'%str(iseg).zfill(2)
+                    ext_dict[dict_name] = ext[seg_start_ind:seg_finish_ind]
+                    load_dict[dict_name] = load[seg_start_ind:seg_finish_ind]
+                    ## ------------------------------------------- ##
+                    pass
+                pass
+            pass
+        pass
+    if mode==0: return load, ext
+    elif mode==1: return load_dict, ext_dict
+    else: raise IOError
