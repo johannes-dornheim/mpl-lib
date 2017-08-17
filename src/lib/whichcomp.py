@@ -10,18 +10,26 @@ def find_vpsc_repo():
     whereami = guessWhereami()
 
     ## test if repo/vpsc-fld-yld is present
-    if   whereami=='palmetto':
-        path_vpsc=pjoin(path_home,'repo','vpsc-fld')
-    elif whereami=='mac':
-        path_vpsc=pjoin(path_home,'repo','vpsc','vpsc-dev-fld')
-    elif whereami=='mbp':
-        path_vpsc=pjoin(path_home,'repo','vpsc-fld-yld')
-    elif whereami=='ubuntu@mml':
-        path_vpsc=pjoin(path_home,'repo','vpsc-fld-yld')
-    elif whereami=='hg@ubuntu':
-        path_vpsc=pjoin(path_home,'vpsc')
+    fn_vpsc_env = os.path.join(path_home,'.vpscyldfld')
+    if os.path.isfile(fn_vpsc_env):
+        with open(fn_vpsc_env,'r') as fo:
+            lines = fo.read().split('\n')
+            path_vpsc = lines[0].split('=')[1]
+        if not os.path.isdir(path_vpsc):
+            raise IOError, 'Could not find %s'%path_vpsc
     else:
-        raise IOError, 'Could not find vpsc repository'
+        if   whereami=='palmetto':
+            path_vpsc=pjoin(path_home,'repo','vpsc-fld')
+        elif whereami=='mac':
+            path_vpsc=pjoin(path_home,'repo','vpsc','vpsc-dev-fld')
+        elif whereami=='mbp':
+            path_vpsc=pjoin(path_home,'repo','vpsc-fld-yld')
+        elif whereami=='ubuntu@mml':
+            path_vpsc=pjoin(path_home,'repo','vpsc-fld-yld')
+        elif whereami=='hg@ubuntu':
+            path_vpsc=pjoin(path_home,'vpsc')
+        else:
+            raise IOError, 'Could not find vpsc repository'
     return path_vpsc
 
 def clues():
