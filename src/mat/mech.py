@@ -200,18 +200,35 @@ class FlowCurve:
                      label='Flow Stress curve')
             ax2.plot(self.epsilon[0,0],self.instR,label='R-value')
 
-    def plot_uni(self):
+    def plot_uni(self,fig=None,**kwargs):
+        """
+        Arguments
+        ---------
+        **kwargs - key-worded arguments for plt.plot
+        """
         import matplotlib.pyplot as plt
-        fig = plt.figure()
-        ax1 = fig.add_subplot(121)
-        ax2 = fig.add_subplot(122)
+        if type(fig)==type(None):
+            fig = plt.figure(figsize=(8,3))
+            ax1 = fig.add_subplot(121)
+            ax2 = fig.add_subplot(122)
+        else:
+            ax1=fig.axes[0]
+            ax2=fig.axes[1]
 
         x=self.epsilon[0,0]
         y=self.sigma[0,0]
 
-        x,y=flip(x,y,mode=0)
-        plt.plot(x,y)
+        y,x=flip(y,x,mode=0)
+        ax1.plot(x,y,**kwargs)
+        ax2.plot(x,self.instR,**kwargs)
 
+        ax1.set_xlabel(r'$\bar{\varepsilon}_{11}$')
+        ax1.set_ylabel(r'$\bar{\sigma}_{11}$')
+
+        ax2.set_xlabel(r'$\bar{\varepsilon}_{11}$')
+        ax2.set_ylabel(r'$R^\mathrm{inst}$')
+
+        plt.tight_layout()
 
     def get_model(self,fn='STR_STR.OUT',iopt=0):
         """
@@ -233,6 +250,8 @@ class FlowCurve:
         EVM=[]
         SVM=[]
         tincrs=[]
+        pmac=[]
+        pwgt=[]
         with open(fn) as f:
             datl = f.read()
             datl = datl.split('\n') ## all the lines.
@@ -286,7 +305,7 @@ class FlowCurve:
                             velgrads.append(v33)
                             tincrs.append(dat[24])
                             # sr, w = self.Decompose_SA(v33)
-                        elif ncol==43: ## EVPSC
+                        elif ncol==45: ## EVPSC
                             self.imod='EVPSC'
                             tempr = dat[14]
                             eps_el = self.conv6_to_33(dat[15:21])
@@ -298,6 +317,9 @@ class FlowCurve:
                             strain_tr.append(eps_tr)
                             velgrads.append(v33)
                             tincrs.append(dat[42])
+
+                            pmac.append(dat[43])
+                            pwgt.append(dat[44])
                         else:
                             raise IOError,\
                                 'Unexpected number of columns found in data file'
@@ -319,7 +341,7 @@ class FlowCurve:
                     tempr = dat[14]
                     v33   = self.conv9_to_33(dat[15:24])
                     velgrads.append(v33)
-                elif ncol==43: # evpsc
+                elif ncol==45: # evpsc
                     tempr = dat[14]
                     eps_el = self.conv6_to_33(dat[15:21])
                     eps_pl = self.conv6_to_33(dat[21:27])
@@ -329,6 +351,9 @@ class FlowCurve:
                     strain_pl.append(eps_pl)
                     strain_tr.append(eps_tr)
                     velgrads.append(v33)
+                    tincrs.append(dat[42])
+                    pmac.append(dat[43])
+                    pwgt.append(dat[44])
                 else:
                     raise IOError,\
                         'Unexpected number of columns found in data file'
@@ -352,6 +377,8 @@ class FlowCurve:
             self.strain_pl = self.strain_pl.swapaxes(0,2).swapaxes(0,1)
             self.strain_tr=np.array(strain_tr)
             self.strain_tr = self.strain_tr.swapaxes(0,2).swapaxes(0,1)
+            self.pmac=np.array(pmac)
+            self.pwgt=np.array(pwgt)
 
         if self.imod in ['VPSC','EVPSC']:
             v  = self.velgrads.copy()
