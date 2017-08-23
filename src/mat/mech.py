@@ -320,6 +320,8 @@ class FlowCurve:
 
                             pmac.append(dat[43])
                             pwgt.append(dat[44])
+                        elif ncol==17: ## EVPSC-HW
+                            self.imod='EVPSC-HW'
                         else:
                             raise IOError,\
                                 'Unexpected number of columns found in data file'
@@ -379,6 +381,8 @@ class FlowCurve:
             self.strain_tr = self.strain_tr.swapaxes(0,2).swapaxes(0,1)
             self.pmac=np.array(pmac)
             self.pwgt=np.array(pwgt)
+        elif self.imod=='EVPSC-HW':
+            pass
 
         if self.imod in ['VPSC','EVPSC']:
             v  = self.velgrads.copy()
