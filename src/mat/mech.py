@@ -1,3 +1,14 @@
+"""
+mech.py module
+
+
+Youngung Jeong, PhD
+
+Department of Materials Science and Engineering
+Changwon National University, Korea
+
+yjeong@changwon.ac.kr
+"""
 import numpy as np
 from scipy import integrate
 cumtrapz=integrate.cumtrapz
@@ -322,11 +333,14 @@ class FlowCurve:
                             pwgt.append(dat[44])
                         elif ncol==17: ## EVPSC-HW
                             self.imod='EVPSC-HW'
+
+                        elif ncol==14: ## EVPSCHW-ori
+                            self.imod='EVPSC-HW-ORI'
                         else:
                             raise IOError,\
                                 'Unexpected number of columns found in data file'
 
-            print 'IMOD:', self.imod
+            # print 'IMOD:', self.imod
 
             if iopt==1:
                 ibreak=False
@@ -382,6 +396,8 @@ class FlowCurve:
             self.pmac=np.array(pmac)
             self.pwgt=np.array(pwgt)
         elif self.imod=='EVPSC-HW':
+            pass
+        elif self.imod=='EVPSC-HW-ORI':
             pass
 
         if self.imod in ['VPSC','EVPSC']:
