@@ -891,17 +891,6 @@ class Texture:
         return fig
 
 
-
-
-
-
-
-
-
-
-
-
-
 def flip(l, e, mode=0):
     """
     If any load of the data is found to be negative,
