@@ -405,7 +405,11 @@ class FlowCurve:
             vt = self.velgrads.swapaxes(0,1)
             self.d33 = 0.5 * (v+vt)
             self.w33 = 0.5 * (v-vt)
-            self.instR = self.d33[1,1]/self.d33[2,2]
+
+            ind=~(self.d33[2,2]==0)
+            self.instR=np.zeros(len(ind))
+            self.instR[~ind]=np.nan
+            self.instR[ind] = self.d33[1,1][ind]/self.d33[2,2][ind]
 
     def get_pmodel(self,fn):
         dat    = np.loadtxt(fn,skiprows=1).T
