@@ -353,7 +353,7 @@ class FlowCurve:
                 stress=dat[8:14]
                 epsilon.append(strain)
                 sigma.append(stress)
-                if len(dat)==24: # vpsc
+                if len(dat)==25: # vpsc
                     tempr = dat[14]
                     v33   = self.conv9_to_33(dat[15:24])
                     velgrads.append(v33)
@@ -371,8 +371,11 @@ class FlowCurve:
                     pmac.append(dat[43])
                     pwgt.append(dat[44])
                 else:
-                    raise IOError,\
-                        'Unexpected number of columns found in data file'
+                    print '**ncol:',ncol
+                    print 'dat:'
+                    print dat
+                    raise IOError,'Unexpected number of columns found in data file'
+
 
         self.get_6stress(x=np.array(sigma).T)
         self.get_6strain(x=np.array(epsilon).T)
