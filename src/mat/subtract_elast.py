@@ -1,7 +1,7 @@
 ## subtract elastic portion of strain from total multi strain.
 
-def bi_axial_iso(eps11,eps22,sig11,sig22,
-                 M=2.e9,nu=0.3,):
+def bi_axial_iso(eps11, eps22, sig11, sig22,
+                 M=2.e9, nu=0.3, ):
     """
     Biaxial, isotropic
 
@@ -12,6 +12,6 @@ def bi_axial_iso(eps11,eps22,sig11,sig22,
     E_22^el = 1/M (S_22 - nu*S_11)
 
     """
-    E11 = 1./M * (sig11-nu*sig22)
-    E22 = 1./M * (sig22-nu*sig11)
+    E11 = 1. / M * (sig11 - nu * sig22)
+    E22 = 1. / M * (sig22 - nu * sig11)
     return E11, E22

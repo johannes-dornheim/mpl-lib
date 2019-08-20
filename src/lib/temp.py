@@ -22,18 +22,20 @@ youngung.jeong@gmail.com
 """
 import os
 
+
 def find_writable(*paths):
     """
     Find and return a writable path among the given paths.
     It returns the writable path as soon as it finds it.
     """
     for path in paths:
-        if os.access(path,os.W_OK):
+        if os.access(path, os.W_OK):
             return path
 
-    print 'No writable folder found among the given list below'
-    print paths
+    print('No writable folder found among the given list below')
+    print(paths)
     raise IOError
+
 
 def find_tmp(verbose=False):
     """
@@ -50,15 +52,15 @@ def find_tmp(verbose=False):
     -------
     _tmp_
     """
-    if os.environ.has_key('TMPDIR'):
-        _tmp_=os.environ['TMPDIR']
+    if 'TMPDIR' in os.environ:
+        _tmp_ = os.environ['TMPDIR']
     else:
-        _tmp_='/tmp/'
+        _tmp_ = '/tmp/'
 
     date = os.popen('date +%Y%m%d_%H%M%S').read().split('\n')[0]
-    _tmp_ = os.path.join(_tmp_,date)
+    _tmp_ = os.path.join(_tmp_, date)
 
-    if not(os.path.isdir(_tmp_)):
+    if not (os.path.isdir(_tmp_)):
         os.mkdir(_tmp_)
     return _tmp_
 
@@ -103,7 +105,8 @@ def find_tmp(verbose=False):
     # if verbose:print('_tmp_:%s'%_tmp_)
     # return _tmp_
 
-def gen_tempfolder(prefix='',affix='',tmp=None):
+
+def gen_tempfolder(prefix='', affix='', tmp=None):
     """
     Create temp folder using tempfile.mkdtemp
 
@@ -119,12 +122,13 @@ def gen_tempfolder(prefix='',affix='',tmp=None):
     tempDirectory
     """
     import tempfile
-    if type(tmp).__name__=='NoneType':
+    if type(tmp).__name__ == 'NoneType':
         tmp = find_tmp(verbose=False)
 
-    return tempfile.mkdtemp(prefix=prefix,suffix=affix,dir=tmp)
+    return tempfile.mkdtemp(prefix=prefix, suffix=affix, dir=tmp)
 
-def gen_tempfile(prefix='',affix='',ext='txt',i=0,tmp=None):
+
+def gen_tempfile(prefix='', affix='', ext='txt', i=0, tmp=None):
     """
     Generate temp file in _tmp_ folder.
     Unless <tmp> argument is specified, the _tmp_ folder
@@ -144,32 +148,34 @@ def gen_tempfile(prefix='',affix='',ext='txt',i=0,tmp=None):
     filename
     """
     import os
-    from etc import gen_hash_code2
+    from .etc import gen_hash_code2
 
-    if prefix=='':
+    if prefix == '':
         prefix = gen_hash_code2(nchar=6)
-    if affix=='':
+    if affix == '':
         affix = gen_hash_code2(nchar=6)
 
-    if type(tmp).__name__=='NoneType':
+    if type(tmp).__name__ == 'NoneType':
         tmp = find_tmp(verbose=False)
     exitCondition = False
     it = 0
-    while not(exitCondition):
+    while not exitCondition:
         hc = gen_hash_code2(nchar=6)
         tmpLocation = find_tmp(verbose=False)
-        if len(affix)>0: filename = '%s-%s-%s'%(prefix,hc,affix)
-        else:            filename = '%s-%s'%(prefix,hc)
-        if type(ext).__name__=='str':
-            filename = '%s.%s'%(filename,ext)
+        if len(affix) > 0:
+            filename = '%s-%s-%s' % (prefix, hc, affix)
+        else:
+            filename = '%s-%s' % (prefix, hc)
+        if type(ext).__name__ == 'str':
+            filename = '%s.%s' % (filename, ext)
 
         ## under the temp folder
-        filename = os.path.join(tmp,filename)
-        exitCondition = not(os.path.isfile(filename))
+        filename = os.path.join(tmp, filename)
+        exitCondition = not (os.path.isfile(filename))
         it = it + 1
-        if it>100: exitCondition=True
+        if it > 100: exitCondition = True
 
-    if it>1:
-        print('Warning: Oddly you just had'+\
-            ' an overlapped file name')
+    if it > 1:
+        print(('Warning: Oddly you just had' + \
+              ' an overlapped file name'))
     return filename

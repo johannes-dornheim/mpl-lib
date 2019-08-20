@@ -11,43 +11,46 @@ yjeong@changwon.ac.kr
 """
 import numpy as np
 from scipy import integrate
-cumtrapz=integrate.cumtrapz
+
+cumtrapz = integrate.cumtrapz
+
 
 class FlowCurve:
     """
     Flow characteristic in full 3x3 dimensions
     """
-    def __init__(self,name=None,description=None):
+
+    def __init__(self, name=None, description=None):
         """        """
         self.nstp = 0
-        self.sigma = np.zeros((3,3,self.nstp))*np.nan
-        self.epsilon = np.zeros((3,3,self.nstp))*np.nan
-        self.flag_sigma = np.zeros((3,3))
-        self.flag_epsilon = np.zeros((3,3))
-        self.flag_6s    = np.zeros((6,))
-        self.flag_6e    = np.zeros((6,))
+        self.sigma = np.zeros((3, 3, self.nstp)) * np.nan
+        self.epsilon = np.zeros((3, 3, self.nstp)) * np.nan
+        self.flag_sigma = np.zeros((3, 3))
+        self.flag_epsilon = np.zeros((3, 3))
+        self.flag_6s = np.zeros((6,))
+        self.flag_6e = np.zeros((6,))
 
         self.is_stress_available = False
         self.is_strain_available = False
 
-    # Voigt vectorial nomenclature (0 - 5)
-        self.vo = [[0,0],[1,1],[2,2],[1,2],[0,2],[0,1]]
+        # Voigt vectorial nomenclature (0 - 5)
+        self.vo = [[0, 0], [1, 1], [2, 2], [1, 2], [0, 2], [0, 1]]
 
-        self.ivo = np.ones((3,3),dtype='int')
+        self.ivo = np.ones((3, 3), dtype='int')
         for i in range(3):
-            self.ivo[i,i] = i
+            self.ivo[i, i] = i
 
-        self.ivo[1,2] = 3
-        self.ivo[2,1] = 3
-        self.ivo[0,2] = 4
-        self.ivo[2,0] = 4
-        self.ivo[0,1] = 5
-        self.ivo[1,0] = 5
+        self.ivo[1, 2] = 3
+        self.ivo[2, 1] = 3
+        self.ivo[0, 2] = 4
+        self.ivo[2, 0] = 4
+        self.ivo[0, 1] = 5
+        self.ivo[1, 0] = 5
 
         self.name = name
         self.descr = description
 
-    def Decompose_SA(self,a):
+    def Decompose_SA(self, a):
         """
         Decompose VG into sym and asym parts
 
@@ -60,11 +63,11 @@ class FlowCurve:
         sym
         asym
         """
-        sym  = 1./2. * (a+a.T)
-        asym = 1./2. * (a-a.T)
+        sym = 1. / 2. * (a + a.T)
+        asym = 1. / 2. * (a - a.T)
         return sym, asym
 
-    def conv6_to_33(self,a):
+    def conv6_to_33(self, a):
         """
         Array <a> in 6 D
 
@@ -72,21 +75,21 @@ class FlowCurve:
         --------
         a  Array
         """
-        a=np.array(a)
-        if a.shape[0]!=6: raise IOError, 'Array should be (6)'
-        b=np.zeros((3,3))
-        b[0,0]=a[0] # 11
-        b[1,1]=a[1] # 22
-        b[2,2]=a[2] # 33
-        b[1,2]=a[3] # 23
-        b[2,1]=a[3]
-        b[0,2]=a[4] # 13
-        b[2,0]=a[4]
-        b[0,1]=a[5] # 12
-        b[1,0]=a[5]
+        a = np.array(a)
+        if a.shape[0] != 6: raise IOError('Array should be (6)')
+        b = np.zeros((3, 3))
+        b[0, 0] = a[0]  # 11
+        b[1, 1] = a[1]  # 22
+        b[2, 2] = a[2]  # 33
+        b[1, 2] = a[3]  # 23
+        b[2, 1] = a[3]
+        b[0, 2] = a[4]  # 13
+        b[2, 0] = a[4]
+        b[0, 1] = a[5]  # 12
+        b[1, 0] = a[5]
         return b
 
-    def conv9_to_33(self,a):
+    def conv9_to_33(self, a):
         """
         array <a> in 9
 
@@ -94,18 +97,18 @@ class FlowCurve:
         --------
         a  array
         """
-        a=np.array(a)
-        if a.shape[0]!=9: raise IOError, 'array should be (9)'
-        b=np.zeros((3,3))
-        b[0,0] = a[0]
-        b[0,1] = a[1]
-        b[0,2] = a[2]
-        b[1,0] = a[3]
-        b[1,1] = a[4]
-        b[1,2] = a[5]
-        b[2,0] = a[6]
-        b[2,1] = a[7]
-        b[2,2] = a[8]
+        a = np.array(a)
+        if a.shape[0] != 9: raise IOError('array should be (9)')
+        b = np.zeros((3, 3))
+        b[0, 0] = a[0]
+        b[0, 1] = a[1]
+        b[0, 2] = a[2]
+        b[1, 0] = a[3]
+        b[1, 1] = a[4]
+        b[1, 2] = a[5]
+        b[2, 0] = a[6]
+        b[2, 1] = a[7]
+        b[2, 2] = a[8]
         return b
 
     def get_eqv(self):
@@ -114,16 +117,16 @@ class FlowCurve:
         the full tensorial states
         """
         if self.is_stress_available and \
-           self.is_strain_available:
+                self.is_strain_available:
             self.get_energy()
             self.get_vm_stress()
-            self.epsilon_vm = self.w/self.sigma_vm
+            self.epsilon_vm = self.w / self.sigma_vm
 
             # print 'VM stress:', self.sigma_vm
             # print 'VM strain:', self.epsilon_vm
 
         elif self.is_stress_available and \
-             not (self.is_strain_available):
+                not self.is_strain_available:
             self.get_vm_strain()
 
     def get_energy(self):
@@ -133,7 +136,7 @@ class FlowCurve:
         w = 0
         for i in range(3):
             for j in range(3):
-                w = w + self.epsilon[i,j] * self.sigma[i,j]
+                w = w + self.epsilon[i, j] * self.sigma[i, j]
         self.w = w
 
     def get_deviatoric_stress(self):
@@ -141,22 +144,22 @@ class FlowCurve:
         ijx = np.identity(3)
         hydro = 0.
         for i in range(3):
-            hydro = hydro + self.sigma[i,i]
+            hydro = hydro + self.sigma[i, i]
         for i in range(3):
             for j in range(3):
-                self.sigma_dev[i,j] = self.sigma[i,j]\
-                                      - 1./3. * hydro * ijx[i,j]
+                self.sigma_dev[i, j] = self.sigma[i, j] \
+                                       - 1. / 3. * hydro * ijx[i, j]
 
     def get_deviatoric_strain(self):
         self.epsilon_dev = np.zeros(self.epsilon.shape)
         ijx = np.identity(3)
         vol = 0.
         for i in range(3):
-            vol = vol + self.epsilon[i,i]
+            vol = vol + self.epsilon[i, i]
         for i in range(3):
             for j in range(3):
-                self.epsilon_dev[i,j] = self.epsilon[i,j]\
-                                        - 1./3. * vol * ijx[i,j]
+                self.epsilon_dev[i, j] = self.epsilon[i, j] \
+                                         - 1. / 3. * vol * ijx[i, j]
 
     def get_vm_stress(self):
         """
@@ -166,8 +169,8 @@ class FlowCurve:
         vm = 0.
         for i in range(3):
             for j in range(3):
-                vm = vm + self.sigma_dev[i,j]**2
-        vm = 3./2. * vm
+                vm = vm + self.sigma_dev[i, j] ** 2
+        vm = 3. / 2. * vm
         self.sigma_vm = np.sqrt(vm)
 
     def get_vm_strain(self):
@@ -185,53 +188,53 @@ class FlowCurve:
         vm = 0.
         for i in range(3):
             for j in range(3):
-                vm = vm + self.epsilon_dev[i,j]**2
-        vm = 2./3. * vm
+                vm = vm + self.epsilon_dev[i, j] ** 2
+        vm = 2. / 3. * vm
         self.epsilon_vm = np.sqrt(vm)
         self.nstp = len(self.epsilon_vm)
 
-    def plot(self,ifig=1):
+    def plot(self, ifig=1):
         import matplotlib.pyplot as plt
-        if self.imod=='VPSC':
+        if self.imod == 'VPSC':
             fig = plt.figure(ifig)
             ax = fig.add_subplot(111)
             for k in range(6):
-                if self.flag_6e[k]==1 and self.flag_6s[k]==1:
-                    i,j = self.vo[k]
-                    ax.plot(self.epsilon[i,j],self.sigma[i,j],'-x',
-                            label='(%i,%i)'%(i+1,j+1))
+                if self.flag_6e[k] == 1 and self.flag_6s[k] == 1:
+                    i, j = self.vo[k]
+                    ax.plot(self.epsilon[i, j], self.sigma[i, j], '-x',
+                            label='(%i,%i)' % (i + 1, j + 1))
             ax.legend(loc='best')
 
-        elif self.imod=='EVPSC':
-            fig = plt.figure(ifig,figsize=(9,4))
-            ax1=fig.add_subplot(121)
-            ax2=fig.add_subplot(122)
+        elif self.imod == 'EVPSC':
+            fig = plt.figure(ifig, figsize=(9, 4))
+            ax1 = fig.add_subplot(121)
+            ax2 = fig.add_subplot(122)
 
-            ax1.plot(self.epsilon[0,0],self.sigma[0,0],'-x',
+            ax1.plot(self.epsilon[0, 0], self.sigma[0, 0], '-x',
                      label='Flow Stress curve')
-            ax2.plot(self.epsilon[0,0],self.instR,label='R-value')
+            ax2.plot(self.epsilon[0, 0], self.instR, label='R-value')
 
-    def plot_uni(self,fig=None,**kwargs):
+    def plot_uni(self, fig=None, **kwargs):
         """
         Arguments
         ---------
         **kwargs - key-worded arguments for plt.plot
         """
         import matplotlib.pyplot as plt
-        if type(fig)==type(None):
-            fig = plt.figure(figsize=(8,3))
+        if type(fig) == type(None):
+            fig = plt.figure(figsize=(8, 3))
             ax1 = fig.add_subplot(121)
             ax2 = fig.add_subplot(122)
         else:
-            ax1=fig.axes[0]
-            ax2=fig.axes[1]
+            ax1 = fig.axes[0]
+            ax2 = fig.axes[1]
 
-        x=self.epsilon[0,0]
-        y=self.sigma[0,0]
+        x = self.epsilon[0, 0]
+        y = self.sigma[0, 0]
 
-        y,x=flip(y,x,mode=0)
-        ax1.plot(x,y,**kwargs)
-        ax2.plot(x,self.instR,**kwargs)
+        y, x = flip(y, x, mode=0)
+        ax1.plot(x, y, **kwargs)
+        ax2.plot(x, self.instR, **kwargs)
 
         ax1.set_xlabel(r'$\bar{\varepsilon}_{11}$')
         ax1.set_ylabel(r'$\bar{\sigma}_{11}$')
@@ -241,7 +244,7 @@ class FlowCurve:
 
         plt.tight_layout()
 
-    def get_model(self,fn='STR_STR.OUT',iopt=0):
+    def get_model(self, fn='STR_STR.OUT', iopt=0):
         """
         Version 2015-06
 
@@ -255,24 +258,24 @@ class FlowCurve:
 
         Read "STR_STR.OUT" that might have 'intermediate headers'
         """
-        ncol=None
-        epsilon=[]
-        sigma=[]
-        EVM=[]
-        SVM=[]
-        tincrs=[]
-        pmac=[]
-        pwgt=[]
+        ncol = None
+        epsilon = []
+        sigma = []
+        EVM = []
+        SVM = []
+        tincrs = []
+        pmac = []
+        pwgt = []
         with open(fn) as f:
             datl = f.read()
-            datl = datl.split('\n') ## all the lines.
-            for i in xrange(len(datl)):
-                l=datl[i]
-                if len(l)>2:
+            datl = datl.split('\n')  ## all the lines.
+            for i in range(len(datl)):
+                l = datl[i]
+                if len(l) > 2:
                     try:
-                        if iopt==0:
-                            dat = map(float,l.split())
-                        if iopt==1:
+                        if iopt == 0:
+                            dat = list(map(float, l.split()))
+                        if iopt == 1:
                             ## Condition 1
                             # Current line (i) should be strings.
                             dum = l.split()
@@ -285,44 +288,44 @@ class FlowCurve:
 
                             ## Condition 2
                             # Previous line i-1 should exist
-                            datl[i-1]
+                            # datl[i - 1]
                             ## Condition 3
                             ## mappable by float
-                            dat = map(float,datl[i-1].split())
-                            if len(dat)==0:
+                            dat = list(map(float, datl[i - 1].split()))
+                            if len(dat) == 0:
                                 raise IOError
                     except:
                         pass
                     else:
-                        if type(ncol)==type(None):
-                            ncol=len(dat)
+                        if type(ncol) == type(None):
+                            ncol = len(dat)
                             velgrads = []
-                            strain_el=[]
-                            strain_pl=[]
-                            strain_tr=[]
+                            strain_el = []
+                            strain_pl = []
+                            strain_tr = []
 
                         # dat = map(float,l.split())
-                        evm,svm=dat[0:2]
+                        evm, svm = dat[0:2]
                         EVM.append(evm)
                         SVM.append(svm)
-                        strain=dat[2:8]
-                        stress=dat[8:14]
+                        strain = dat[2:8]
+                        stress = dat[8:14]
                         epsilon.append(strain)
                         sigma.append(stress)
-                        if ncol==25: ## VPSC
-                            self.imod='VPSC'
+                        if ncol == 25:  ## VPSC
+                            self.imod = 'VPSC'
                             tempr = dat[14]
-                            v33   = self.conv9_to_33(dat[15:24])
+                            v33 = self.conv9_to_33(dat[15:24])
                             velgrads.append(v33)
                             tincrs.append(dat[24])
                             # sr, w = self.Decompose_SA(v33)
-                        elif ncol==45: ## EVPSC
-                            self.imod='EVPSC'
+                        elif ncol == 45:  ## EVPSC
+                            self.imod = 'EVPSC'
                             tempr = dat[14]
                             eps_el = self.conv6_to_33(dat[15:21])
                             eps_pl = self.conv6_to_33(dat[21:27])
                             eps_tr = self.conv6_to_33(dat[27:33])
-                            v33    = self.conv9_to_33(dat[33:42])
+                            v33 = self.conv9_to_33(dat[33:42])
                             strain_el.append(eps_el)
                             strain_pl.append(eps_pl)
                             strain_tr.append(eps_tr)
@@ -331,38 +334,37 @@ class FlowCurve:
 
                             pmac.append(dat[43])
                             pwgt.append(dat[44])
-                        elif ncol==17: ## EVPSC-HW
-                            self.imod='EVPSC-HW'
+                        elif ncol == 17:  ## EVPSC-HW
+                            self.imod = 'EVPSC-HW'
 
-                        elif ncol==14: ## EVPSCHW-ori
-                            self.imod='EVPSC-HW-ORI'
+                        elif ncol == 14:  ## EVPSCHW-ori
+                            self.imod = 'EVPSC-HW-ORI'
                         else:
-                            raise IOError,\
-                                'Unexpected number of columns found in data file'
+                            raise IOError('Unexpected number of columns found in data file')
 
             # print 'IMOD:', self.imod
 
-            if iopt==1:
-                ibreak=False
-                dat=map(float,datl[-2].split())
+            if iopt == 1:
+                ibreak = False
+                dat = list(map(float, datl[-2].split()))
 
-                evm,svm=dat[0:2]
+                evm, svm = dat[0:2]
                 EVM.append(evm)
                 SVM.append(svm)
-                strain=dat[2:8]
-                stress=dat[8:14]
+                strain = dat[2:8]
+                stress = dat[8:14]
                 epsilon.append(strain)
                 sigma.append(stress)
-                if len(dat)==25: # vpsc
+                if len(dat) == 25:  # vpsc
                     tempr = dat[14]
-                    v33   = self.conv9_to_33(dat[15:24])
+                    v33 = self.conv9_to_33(dat[15:24])
                     velgrads.append(v33)
-                elif ncol==45: # evpsc
+                elif ncol == 45:  # evpsc
                     tempr = dat[14]
                     eps_el = self.conv6_to_33(dat[15:21])
                     eps_pl = self.conv6_to_33(dat[21:27])
                     eps_tr = self.conv6_to_33(dat[27:33])
-                    v33    = self.conv9_to_33(dat[33:42])
+                    v33 = self.conv9_to_33(dat[33:42])
                     strain_el.append(eps_el)
                     strain_pl.append(eps_pl)
                     strain_tr.append(eps_tr)
@@ -371,170 +373,170 @@ class FlowCurve:
                     pmac.append(dat[43])
                     pwgt.append(dat[44])
                 else:
-                    print '**ncol:',ncol
-                    print 'dat:'
-                    print dat
-                    raise IOError,'Unexpected number of columns found in data file'
-
+                    print(('**ncol:', ncol))
+                    print('dat:')
+                    print(dat)
+                    raise IOError('Unexpected number of columns found in data file')
 
         self.get_6stress(x=np.array(sigma).T)
         self.get_6strain(x=np.array(epsilon).T)
         self.epsilon_vm = EVM[::]
-        self.sigma_vm=SVM[::]
-        self.w = cumtrapz(y=SVM,x=EVM,initial=0)
+        self.sigma_vm = SVM[::]
+        self.w = cumtrapz(y=SVM, x=EVM, initial=0)
 
-        if self.imod=='VPSC':
+        if self.imod == 'VPSC':
             self.velgrads = np.array(velgrads)
-            self.velgrads = self.velgrads.swapaxes(0,2).swapaxes(0,1)
+            self.velgrads = self.velgrads.swapaxes(0, 2).swapaxes(0, 1)
             self.tincrs = np.array(tincrs)
-        elif self.imod=='EVPSC':
+        elif self.imod == 'EVPSC':
             self.velgrads = np.array(velgrads)
-            self.velgrads = self.velgrads.swapaxes(0,2).swapaxes(0,1)
-            self.strain_el=np.array(strain_el)
-            self.strain_el = self.strain_el.swapaxes(0,2).swapaxes(0,1)
-            self.strain_pl=np.array(strain_pl)
-            self.strain_pl = self.strain_pl.swapaxes(0,2).swapaxes(0,1)
-            self.strain_tr=np.array(strain_tr)
-            self.strain_tr = self.strain_tr.swapaxes(0,2).swapaxes(0,1)
-            self.pmac=np.array(pmac)
-            self.pwgt=np.array(pwgt)
-        elif self.imod=='EVPSC-HW':
+            self.velgrads = self.velgrads.swapaxes(0, 2).swapaxes(0, 1)
+            self.strain_el = np.array(strain_el)
+            self.strain_el = self.strain_el.swapaxes(0, 2).swapaxes(0, 1)
+            self.strain_pl = np.array(strain_pl)
+            self.strain_pl = self.strain_pl.swapaxes(0, 2).swapaxes(0, 1)
+            self.strain_tr = np.array(strain_tr)
+            self.strain_tr = self.strain_tr.swapaxes(0, 2).swapaxes(0, 1)
+            self.pmac = np.array(pmac)
+            self.pwgt = np.array(pwgt)
+        elif self.imod == 'EVPSC-HW':
             pass
-        elif self.imod=='EVPSC-HW-ORI':
+        elif self.imod == 'EVPSC-HW-ORI':
             pass
 
-        if self.imod in ['VPSC','EVPSC']:
-            v  = self.velgrads.copy()
-            vt = self.velgrads.swapaxes(0,1)
-            self.d33 = 0.5 * (v+vt)
-            self.w33 = 0.5 * (v-vt)
+        if self.imod in ['VPSC', 'EVPSC']:
+            v = self.velgrads.copy()
+            vt = self.velgrads.swapaxes(0, 1)
+            self.d33 = 0.5 * (v + vt)
+            self.w33 = 0.5 * (v - vt)
 
-            ind=~(self.d33[2,2]==0)
-            self.instR=np.zeros(len(ind))
-            self.instR[~ind]=np.nan
-            self.instR[ind] = self.d33[1,1][ind]/self.d33[2,2][ind]
+            ind = ~(self.d33[2, 2] == 0)
+            self.instR = np.zeros(len(ind))
+            self.instR[~ind] = np.nan
+            self.instR[ind] = self.d33[1, 1][ind] / self.d33[2, 2][ind]
 
-    def get_pmodel(self,fn):
-        dat    = np.loadtxt(fn,skiprows=1).T
+    def get_pmodel(self, fn):
+        dat = np.loadtxt(fn, skiprows=1).T
         stress = dat[6:12]
         strain = dat[12:18]
         self.get_6stress(x=stress)
         self.get_6strain(x=strain)
 
-    def get_pmodel_lat(self,fn):
-        dat = np.loadtxt(fn,skiprows=1).T
+    def get_pmodel_lat(self, fn):
+        dat = np.loadtxt(fn, skiprows=1).T
         e_phl = dat[18:24]
         self.get_6strain(x=e_phl)
 
-    def get_stress(self,x,i,j):
+    def get_stress(self, x, i, j):
         self.is_stress_available = True
-        self.flag_sigma[i,j] = 1
-        self.flag_6s[self.ivo[i,j]] = 1
-        if len(x)>self.nstp:
+        self.flag_sigma[i, j] = 1
+        self.flag_6s[self.ivo[i, j]] = 1
+        if len(x) > self.nstp:
             self.size(len(x))
         for k in range(len(x)):
-            self.sigma[i,j,k] = x[k]
+            self.sigma[i, j, k] = x[k]
 
-    def get_strain(self,x,i,j):
+    def get_strain(self, x, i, j):
         self.is_strain_available = True
-        self.flag_epsilon[i,j] = 1
-        self.flag_6e[self.ivo[i,j]] = 1
-        if len(x)>self.nstp:
+        self.flag_epsilon[i, j] = 1
+        self.flag_6e[self.ivo[i, j]] = 1
+        if len(x) > self.nstp:
             self.size(len(x))
         for k in range(len(x)):
-            self.epsilon[i,j,k] = x[k]
+            self.epsilon[i, j, k] = x[k]
 
-    def get_6stress(self,x):
+    def get_6stress(self, x):
         """
         stress dimension: (6,nstp)
         """
         self.is_stress_available = True
-        self.flag_sigma[:,:] = 1
+        self.flag_sigma[:, :] = 1
         self.flag_6s[:] = 1
         n = x.shape[-1]
-        if n>self.nstp:
+        if n > self.nstp:
             self.size(n)
         for k in range(len(self.vo)):
-            i,j = self.vo[k]
-            self.sigma[i,j,0:n] = x[k,0:n].copy()
-            self.sigma[j,i,0:n] = x[k,0:n].copy()
+            i, j = self.vo[k]
+            self.sigma[i, j, 0:n] = x[k, 0:n].copy()
+            self.sigma[j, i, 0:n] = x[k, 0:n].copy()
 
-    def get_6strain(self,x):
+    def get_6strain(self, x):
         """
         strain dimension: (6,nstp)
         """
         self.is_strain_available = True
-        self.flag_epsilon[:,:] = 1
+        self.flag_epsilon[:, :] = 1
         self.flag_6e[:] = 1
         n = x.shape[-1]
-        if n>self.nstp:
+        if n > self.nstp:
             self.size(n)
         for k in range(len(self.vo)):
-            i,j = self.vo[k]
-            self.epsilon[i,j,0:n] = x[k,0:n].copy()
-            self.epsilon[j,i,0:n] = x[k,0:n].copy()
+            i, j = self.vo[k]
+            self.epsilon[i, j, 0:n] = x[k, 0:n].copy()
+            self.epsilon[j, i, 0:n] = x[k, 0:n].copy()
 
-    def get_33stress(self,x):
+    def get_33stress(self, x):
         for i in range(3):
             for j in range(3):
-                self.get_stress(x[i,j],i,j)
-    def get_33strain(self,x):
+                self.get_stress(x[i, j], i, j)
+
+    def get_33strain(self, x):
         for i in range(3):
             for j in range(3):
-                self.get_strain(x[i,j],i,j)
+                self.get_strain(x[i, j], i, j)
 
-    def set_zero_sigma_ij(self,i,j):
-        self.set_zero_sigma_k(k=self.ivo[i,j])
+    def set_zero_sigma_ij(self, i, j):
+        self.set_zero_sigma_k(k=self.ivo[i, j])
 
-    def set_zero_epsilon_ij(self,i,j):
-        self.set_zero_epsilon_k(k=self.ivo[i,j])
+    def set_zero_epsilon_ij(self, i, j):
+        self.set_zero_epsilon_k(k=self.ivo[i, j])
 
-    def set_zero_sigma_k(self,k=None):
-        i,j = self.vo[k]
+    def set_zero_sigma_k(self, k=None):
+        i, j = self.vo[k]
         n = self.nstp
-        self.sigma[i,j,0:n] = 0
-        self.sigma[j,i,0:n] = 0
+        self.sigma[i, j, 0:n] = 0
+        self.sigma[j, i, 0:n] = 0
 
-    def set_zero_epsilon_k(self,k=None):
-        i,j = self.vo[k]
+    def set_zero_epsilon_k(self, k=None):
+        i, j = self.vo[k]
         n = self.nstp
-        self.epsilon[i,j,0:n] = 0
-        self.epsilon[j,i,0:n] = 0
+        self.epsilon[i, j, 0:n] = 0
+        self.epsilon[j, i, 0:n] = 0
 
     def set_zero_shear_strain(self):
         for i in range(3):
             for j in range(3):
-                if i!=j: self.set_zero_epsilon_ij(i,j)
+                if i != j: self.set_zero_epsilon_ij(i, j)
 
     def set_zero_shear_stress(self):
         for i in range(3):
             for j in range(3):
-                if i!=j: self.set_zero_sigma_ij(i,j)
+                if i != j: self.set_zero_sigma_ij(i, j)
 
     def check(self):
-        if self.sigma.shape!=self.epsilon.shape:
-            raise IOError, 'Flow data array size is not matched.'
+        if self.sigma.shape != self.epsilon.shape:
+            raise IOError('Flow data array size is not matched.')
 
     def set_uni_axial(self):
-        self.get_stress([0,100,300,400,500],0,0)
-        self.set_zero_sigma_ij(1,1)
-        self.set_zero_sigma_ij(2,2)
+        self.get_stress([0, 100, 300, 400, 500], 0, 0)
+        self.set_zero_sigma_ij(1, 1)
+        self.set_zero_sigma_ij(2, 2)
         self.set_zero_shear_stress()
 
-        self.get_strain([0,0.00001,0.002,0.05,0.015],0,0)
-        self.get_strain([0,-0.000003,-0.001,-0.025,-0.0075],1,1)
-        self.get_strain([0,-0.000003,-0.001,-0.025,-0.0075],2,2)
+        self.get_strain([0, 0.00001, 0.002, 0.05, 0.015], 0, 0)
+        self.get_strain([0, -0.000003, -0.001, -0.025, -0.0075], 1, 1)
+        self.get_strain([0, -0.000003, -0.001, -0.025, -0.0075], 2, 2)
         self.set_zero_shear_strain()
 
     def set_bi_axial(self):
-        self.get_stress([0,100,300,400,500],0,0)
-        self.get_stress([0,100,300,400,500],1,1)
-        self.set_zero_sigma_ij(2,2)
+        self.get_stress([0, 100, 300, 400, 500], 0, 0)
+        self.get_stress([0, 100, 300, 400, 500], 1, 1)
+        self.set_zero_sigma_ij(2, 2)
         self.set_zero_shear_stress()
 
-        self.get_strain([0,0.00001,0.002,0.05,0.015],0,0)
-        self.get_strain([0,-0.000003,-0.001,-0.025,-0.0075],1,1)
-        self.get_strain([0,-0.000003,-0.001,-0.025,-0.0075],2,2)
+        self.get_strain([0, 0.00001, 0.002, 0.05, 0.015], 0, 0)
+        self.get_strain([0, -0.000003, -0.001, -0.025, -0.0075], 1, 1)
+        self.get_strain([0, -0.000003, -0.001, -0.025, -0.0075], 2, 2)
         self.set_zero_shear_strain()
 
     def integrate_work(self):
@@ -546,43 +548,43 @@ class FlowCurve:
         Advised to be used for 'experimental' data
         """
 
-        if not(self.is_strain_available) or \
-           not(self.is_stress_available):
-            raise IOError, 'Either stress or strain is missing'
-        k=0
+        if not self.is_strain_available or \
+                not self.is_stress_available:
+            raise IOError('Either stress or strain is missing')
+        k = 0
         for i in range(3):
             for j in range(3):
-                if self.flag_epsilon[i,j]==1 and \
-                   self.flag_sigma[i,j]==1:
-                    sij = self.sigma[i,j]
-                    eij = self.epsilon[i,j]
-                    if k==0:
-                        w = cumtrapz(y=sij,x=eij,initial=0)
+                if self.flag_epsilon[i, j] == 1 and \
+                                self.flag_sigma[i, j] == 1:
+                    sij = self.sigma[i, j]
+                    eij = self.epsilon[i, j]
+                    if k == 0:
+                        w = cumtrapz(y=sij, x=eij, initial=0)
                     else:
-                        w = w + cumtrapz(y=sij,x=eij,initial=0)
-                    k=k+1
+                        w = w + cumtrapz(y=sij, x=eij, initial=0)
+                    k = k + 1
                 else:
                     ## skip this component
                     pass
         self.work = w
 
-    def size(self,n):
+    def size(self, n):
         """
         """
         oldn = self.nstp
-        newsigma   = np.zeros((3,3,n))*np.nan
-        newepsilon = np.zeros((3,3,n))*np.nan
+        newsigma = np.zeros((3, 3, n)) * np.nan
+        newepsilon = np.zeros((3, 3, n)) * np.nan
         self.nstp = n
-        if oldn==0:pass
-        if oldn>0:
+        if oldn == 0: pass
+        if oldn > 0:
             for i in range(oldn):
-                newsigma[:,:,i] = self.sigma[:,:,i].copy()
-                newepsilon[:,:,i] = self.epsilon[:,:,i].copy()
+                newsigma[:, :, i] = self.sigma[:, :, i].copy()
+                newepsilon[:, :, i] = self.epsilon[:, :, i].copy()
 
-        self.sigma=newsigma.copy()
-        self.epsilon=newepsilon.copy()
+        self.sigma = newsigma.copy()
+        self.epsilon = newepsilon.copy()
 
-    def fit_hard(self,p0s,p0v,iplot):
+    def fit_hard(self, p0s, p0v, iplot):
         """
         Fit strain-hardening parameters
 
@@ -595,17 +597,17 @@ class FlowCurve:
         import mk.materials
         # import mk.materials.func_hard_for
 
-        func_swift=mk.materials.func_hard.func_swift
-        func_voce =mk.materials.func_hard.func_voce
+        func_swift = mk.materials.func_hard.func_swift
+        func_voce = mk.materials.func_hard.func_voce
         # func_hm   =mk.materials.func_hard.func_hollomon
 
-        dat=[self.epsilon_vm, self.sigma_vm]
+        dat = [self.epsilon_vm, self.sigma_vm]
         self.f_swift, self.p_swift, pcov_swift \
             = mk.materials.func_hard_char.main(
-                exp_dat=dat,f_hard=func_swift,params=p0s)
-        self.f_voce,  self.p_voce,  pcov_voce \
+            exp_dat=dat, f_hard=func_swift, params=p0s)
+        self.f_voce, self.p_voce, pcov_voce \
             = mk.materials.func_hard_char.main(
-                exp_dat=dat,f_hard=func_voce, params=p0v)
+            exp_dat=dat, f_hard=func_voce, params=p0v)
 
         ## Cannot pickle fortran object yet, thus is not considered.
         # a,b0,c,b1 = self.p_voce
@@ -618,19 +620,20 @@ class FlowCurve:
 
         if iplot:
             import matplotlib.pyplot as plt
-            fig=plt.figure();ax=fig.add_subplot(111)
-            x=np.linspace(self.epsilon_vm[0],self.epsilon_vm[1],100)
-            y_voce =self.f_voce(x)
-            y_swift=self.f_swift(x)
+            fig = plt.figure();
+            ax = fig.add_subplot(111)
+            x = np.linspace(self.epsilon_vm[0], self.epsilon_vm[1], 100)
+            y_voce = self.f_voce(x)
+            y_swift = self.f_swift(x)
 
             ax.plot(self.epsilon_vm,
-                    self.sigma_vm,'--',label='von Mises VPSC')
-            ax.plot(x,y_voce,':',label='Voce fit')
-            ax.plot(x,y_swift,'-.',label='Swift fit')
+                    self.sigma_vm, '--', label='von Mises VPSC')
+            ax.plot(x, y_voce, ':', label='Voce fit')
+            ax.plot(x, y_swift, '-.', label='Swift fit')
             ax.legend()
 
 
-def true2engi(true_e,true_s):
+def true2engi(true_e, true_s):
     """
     Convert true stress/strain to engineering strains
 
@@ -640,8 +643,9 @@ def true2engi(true_e,true_s):
     true_s
     """
     engi_e = __truestrain2e__(true_e[::])
-    engi_s = true_s/(1+engi_e)
+    engi_s = true_s / (1 + engi_e)
     return engi_e, engi_s
+
 
 def engi_e2true_e(engi_e):
     """
@@ -651,42 +655,45 @@ def engi_e2true_e(engi_e):
     ---------
     engi_e
     """
-    epsilon_true = np.log(1+engi_e)
+    epsilon_true = np.log(1 + engi_e)
     return epsilon_true
 
-def engi2true(engi_e,engi_s):
+
+def engi2true(engi_e, engi_s):
     """
     Convert engineering stress / strain to true stress and strain.
     """
-    if (engi_e>=0).all() and (engi_s>=0).all():
-        epsilon_true = np.log(1+engi_e)
-        sigma_true   = engi_s * (1+engi_e)
+    if (engi_e >= 0).all() and (engi_s >= 0).all():
+        epsilon_true = np.log(1 + engi_e)
+        sigma_true = engi_s * (1 + engi_e)
     else:
-        raise IOError, 'Unexpected case'
+        raise IOError('Unexpected case')
     return epsilon_true, sigma_true
+
 
 def __truestrain2e__(e):
     """Convert true strain to that of engineering"""
-    return np.exp(e)-1.
+    return np.exp(e) - 1.
 
-def __IsEqFlow__(a,b):
+
+def __IsEqFlow__(a, b):
     answer = True
-    if not((a.flag_sigma==b.flag_sigma).all):
-        print 'sigma flag is not matched'
+    if not (a.flag_sigma == b.flag_sigma).all:
+        print('sigma flag is not matched')
         answer = False
-    if not((a.sigma==b.sigma).all):
-        print 'sigma is not the same'
+    if not (a.sigma == b.sigma).all:
+        print('sigma is not the same')
         answer = False
-    if not((a.flag_epsilon==b.flag_epsilon).all):
-        print 'epsilon flag is not matched'
+    if not (a.flag_epsilon == b.flag_epsilon).all:
+        print('epsilon flag is not matched')
         answer = False
-    if not((a.epsilon==b.epsilon).all):
-        print 'epsilon is not the same'
+    if not (a.epsilon == b.epsilon).all:
+        print('epsilon is not the same')
         answer = False
     return answer
 
 
-def average_flow_curve(xs,ys,n=10):
+def average_flow_curve(xs, ys, n=10):
     """
     Return average flow curve
 
@@ -701,15 +708,16 @@ def average_flow_curve(xs,ys,n=10):
     mx = 0
     for i in range(ndatset):
         m = max(xs[i])
-        if m>mx: mx = m
+        if m > mx: mx = m
 
-    x_ref = np.linspace(0,mx,n)
+    x_ref = np.linspace(0, mx, n)
 
     ## interpolate each data files
     Y = []
     for i in range(ndatset):
-        xp = xs[i]; fp = ys[i]
-        y_i = np.interp(x_ref,xp,fp) # new interpolate y
+        xp = xs[i];
+        fp = ys[i]
+        y_i = np.interp(x_ref, xp, fp)  # new interpolate y
         Y.append(y_i)
     Y = np.array(Y)
     ## average and standard deviation
@@ -717,8 +725,8 @@ def average_flow_curve(xs,ys,n=10):
     std = []
     for i in range(n):
         f = Y.T[i]
-        a=np.average(f)
-        b=np.std(f)
+        a = np.average(f)
+        b = np.std(f)
         avg.append(a)
         std.append(b)
 
@@ -737,27 +745,29 @@ def find_nhead(fn='STR_STR.OUT'):
     Returns
     The number of heads
     """
-    f=open(fn,'r');lines=f.readlines();f.close()
-    nhead=0
-    success=False
-    while not(success):
+    f = open(fn, 'r');
+    lines = f.readlines();
+    f.close()
+    nhead = 0
+    success = False
+    while not success:
         try:
-            map(float,lines[nhead].split())
+            list(map(float, lines[nhead].split()))
         except ValueError:
-            nhead=nhead+1
+            nhead = nhead + 1
         else:
-            success=True
+            success = True
     return nhead
 
-def find_err(fa,fb):
+
+def find_err(fa, fb):
     """
     Compare the two FlowCurve objects and return
     errors at indivial plastic levels.
     """
     from MP.mat.mech import FlowCurve as FC
     fd = FC()
-    if fa.nstp!=fb.nstp: raise IOError,\
-       'Number of data points are not matching'
+    if fa.nstp != fb.nstp: raise IOError('Number of data points are not matching')
 
     fd_sigma = fa.sigma - fb.sigma
     fd.get_33stress(fd_sigma)
@@ -766,59 +776,71 @@ def find_err(fa,fb):
     ##fd.get_33strain(fa.epsilon)
     ## fd.epsilon_vm = fa.epsilon_vm[::]
 
-    return (fd.sigma_vm) / fa.sigma_vm
+    return fd.sigma_vm / fa.sigma_vm
+
+
 """
 """
+
 
 class WPH:
     """
     May contain its corresponding Flow objective
     with respect to mechanical deformation flow
     """
-    def __init__(self,iph=None):
+
+    def __init__(self, iph=None):
         """
         Argument name: iph
         """
-        self.iph=iph
+        self.iph = iph
         self.flow = FlowCurve()
         self.nstp = 0
         self.vf = []
         pass
-    def get_wph(self,dat,i,j,strain=None,stress=None):
-        self.get_vf(dat)
-        if strain!=None: self.get_strain(strain,i,j)
-        if stress!=None: self.get_stress(stress,i,j)
 
-    def get_vf(self,dat):
+    def get_wph(self, dat, i, j, strain=None, stress=None):
+        self.get_vf(dat)
+        if strain is not None: self.get_strain(strain, i, j)
+        if stress is not None: self.get_stress(stress, i, j)
+
+    def get_vf(self, dat):
         self.vf = dat
         self.nstp = len(self.vf)
-    def get_strain(self,dat,i,j):
-        self.flow.get_strain(dat,i,j)
-    def get_stress(self,dat,i,j):
-        self.flow.get_stress(dat,i,j)
+
+    def get_strain(self, dat, i, j):
+        self.flow.get_strain(dat, i, j)
+
+    def get_stress(self, dat, i, j):
+        self.flow.get_stress(dat, i, j)
+
     def check(self):
         self.flow.check()
-        if self.flow.nstp!=self.nstp:
-            raise IOError, 'Flow curve and WPH array size'\
-                ' is not matched'
-        self.nstp!=self.flow.nstp
+        if self.flow.nstp != self.nstp:
+            raise IOError('Flow curve and WPH array size' \
+                           ' is not matched')
+        # self.nstp != self.flow.nstp
+
 
 class PCYS:
     def __init__(self):
         """
         How to represent a 'snapshot' of history?
         """
-        self.fc=np.nan
-        self.tx=np.nan
-    def read_pcys(self,fn='PCYS.OUT'):
-        s1,s2,d1,d2=np.loadtxt(fn,skiprows=1).T
-        self.dat=np.array([s1,s2,d1,d2])
-    def read_fc(self,fc):
-        self.fc=fc
-    # def read_tx_fn(self,fn='TEX_PH1.OUT'):
-    #     pass
+        self.fc = np.nan
+        self.tx = np.nan
 
-def dev2pi(s1,s2):
+    def read_pcys(self, fn='PCYS.OUT'):
+        s1, s2, d1, d2 = np.loadtxt(fn, skiprows=1).T
+        self.dat = np.array([s1, s2, d1, d2])
+
+    def read_fc(self, fc):
+        self.fc = fc
+        # def read_tx_fn(self,fn='TEX_PH1.OUT'):
+        #     pass
+
+
+def dev2pi(s1, s2):
     """
     Project the yield locus (s1,s2) in deviatoric pi-plane
     to that in the plane-stress (s11,s22) with s33=0
@@ -842,14 +864,16 @@ def dev2pi(s1,s2):
     sq2 = np.sqrt(2.)
     sq6 = np.sqrt(6.)
 
-    s11 = -0.5 * (s1*sq2 + s2*sq6)
-    s22 = s11 + s1*sq2
+    s11 = -0.5 * (s1 * sq2 + s2 * sq6)
+    s22 = s11 + s1 * sq2
     return s11, s22
 
+
 class Texture:
-    def __init__(self,fn):
+    def __init__(self, fn):
         self.read(fn)
-    def read(self,fn='TEX_PH1.OUT'):
+
+    def read(self, fn='TEX_PH1.OUT'):
         """
         Read texture file from VPSC and store necessary information...
 
@@ -863,25 +887,25 @@ class Texture:
         blocks = conts.split('TEXTURE AT STRAIN =')
         blocks = blocks[1::]
 
-        print 'number of snapshots:', len(blocks)
+        print(('number of snapshots:', len(blocks)))
 
-        px  = [] ## polycrystal snapshot at each block
-        macroStrain = [] ## macro strain of each snapshot.
+        px = []  ## polycrystal snapshot at each block
+        macroStrain = []  ## macro strain of each snapshot.
         for i in range(len(blocks)):
             lines = blocks[i].split('\n')
             e = float(lines[0].split()[-1])
             macroStrain.append(e)
-            linesOfGrains = lines[4:-1] # at each block
-            grains=[]
+            linesOfGrains = lines[4:-1]  # at each block
+            grains = []
             for eachLine in linesOfGrains:
-                gr=map(float,eachLine.split())
+                gr = list(map(float, eachLine.split()))
                 grains.append(gr)
             px.append(grains)
 
-        self.px          = np.array(px)
+        self.px = np.array(px)
         self.macroStrain = np.array(macroStrain)
 
-    def plot(self,ib=0,csym='cubic',cdim=[1.,1.,1.],**kwargs):
+    def plot(self, ib=0, csym='cubic', cdim=[1., 1., 1.], **kwargs):
         """
         Plot pole figures for the given snapshot id <ib>
 
@@ -893,8 +917,8 @@ class Texture:
         **kwargs passed to upf.pf_new
         """
         import TX.upf
-        mypf=TX.upf.polefigure(grains=self.px[ib],csym=csym,cdim=cdim)
-        fig=mypf.pf_new(**kwargs)
+        mypf = TX.upf.polefigure(grains=self.px[ib], csym=csym, cdim=cdim)
+        fig = mypf.pf_new(**kwargs)
         return fig
 
 
@@ -916,50 +940,53 @@ def flip(l, e, mode=0):
     # self.mode= 0 or 1 (0 continuous, 1 translate to the origin)
 
     load = np.array(l).copy()
-    ext  = np.array(e).copy()
+    ext = np.array(e).copy()
 
     ## Dict list data (deformation segment) ------------- ##
-    ext_dict  = dict()
+    ext_dict = dict()
     load_dict = dict()
     rvs_points = list()
     ## -------------------------------------------------- ##
-    if len(load)!=len(ext): raise IOError
+    if len(load) != len(ext): raise IOError
 
-    iseg = 0 ## segment labeling
+    iseg = 0  ## segment labeling
     rvs_points.append(0)
     for i in range(len(load)):
-        if load[i]<0:
+        if load[i] < 0:
             iseg = iseg + 1
             rvs_points.append(i)
             ## change of the load sign (crossed the border)
             try:
-                x0 =  ext[i-1]; x1 =  ext[i]
-                y0 = load[i-1]; y1 = load[i]
+                x0 = ext[i - 1];
+                x1 = ext[i]
+                y0 = load[i - 1];
+                y1 = load[i]
             ## Probably due to wrong index for ext or load
-            except: raise IOError, 'unexpected index problem'
+            except:
+                raise IOError('unexpected index problem')
             else:
                 slope = (y1 - y0) / (x1 - x0)
                 ## mirror-flip
-                if mode==0:
+                if mode == 0:
                     point = - y0 / slope + x0
                     ext[i:len(ext)] = point + point - ext[i:len(ext)]
                     load[i:len(load)] = - load[i:len(load)]
                     pass
                 ## mirror-flip and translates to (0,0) point
-                elif mode==1:
+                elif mode == 1:
                     ## perform the flip! ------------------------- ##
                     ext[i:] = - (ext[i:len(ext)] - ext[i])
                     load[i:] = - load[i:len(load)]
                     ## ------------------------------------------- ##
 
                     ## dictionary type data for each segment ----- ##
-                    seg_start_ind = rvs_points[len(rvs_points)-2]
+                    seg_start_ind = rvs_points[len(rvs_points) - 2]
                     seg_finish_ind = rvs_points[-1]
                     # print seg_start_ind
                     # print seg_finish_ind
                     # print 'id: %i %i'%(seg_start_ind, seg_finish_ind)
 
-                    dict_name = '%s_seg'%str(iseg).zfill(2)
+                    dict_name = '%s_seg' % str(iseg).zfill(2)
                     ext_dict[dict_name] = ext[seg_start_ind:seg_finish_ind]
                     load_dict[dict_name] = load[seg_start_ind:seg_finish_ind]
                     ## ------------------------------------------- ##
@@ -967,6 +994,9 @@ def flip(l, e, mode=0):
                 pass
             pass
         pass
-    if mode==0: return load, ext
-    elif mode==1: return load_dict, ext_dict
-    else: raise IOError
+    if mode == 0:
+        return load, ext
+    elif mode == 1:
+        return load_dict, ext_dict
+    else:
+        raise IOError
